@@ -5,12 +5,8 @@ function evaluate2(cb) {
   cb(this[0], this[1]);
 }
 
-let recycled = [], recycledEmitters = [];
-
 export function create(emit) {
-  let self = (emit ? recycledEmitters : recycled).pop();
-  if(self) return self;
-  
+  let self;
   const nodes = new Map();
   let adders, updaters, removers;
   if(emit) {
@@ -94,13 +90,4 @@ export function create(emit) {
   return self = {
     set, remove, clear, has, get
   };
-}
-
-export function recycle(node) {
-  node.clear();
-  if(node.onAdd) {
-    recycledEmitters.push(node);
-  } else {
-    recycled.push(node);
-  }
 }
