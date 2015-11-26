@@ -47,9 +47,10 @@ export function create() {
 export function makeEmitter(node) {
   const adders = new Set(), updaters = new Set(), removers = new Set();
   
+  const has = node.has;
   const set = node.set;
   node.set = (node, value) => {
-    const haveIt = nodeMap.has(node);
+    const haveIt = has(node);
     if(set(node, value)) {
       (haveIt ? updaters : adders).forEach(evaluate2, [node, value]);
       return true;
