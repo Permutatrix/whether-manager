@@ -53,13 +53,14 @@ export function create(emit) {
       }
       return false;
     };
+  const removeB = (a, b) => remove(b);
   const clear = emit ?
     () => {
-      nodeMap.forEach(remove);
+      nodeMap.forEach(removeB);
       adders.clear(); updaters.clear(); removers.clear();
     } :
     () => {
-      nodeMap.forEach(remove);
+      nodeMap.forEach(removeB);
     };
   const has = node => nodeMap.has(node);
   const get = node => nodeMap.get(node);
