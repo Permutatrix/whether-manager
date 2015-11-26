@@ -1,2 +1,2 @@
-import * as Node from './Node.js';
-export { Node };
+import * as node from './node.js';
+export { node };
