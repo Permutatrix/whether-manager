@@ -8,7 +8,7 @@ function pushB(a, b) {
   this.push(b);
 }
 
-export function create() {
+export function node() {
   let self;
   const nodeMap = new Map();
   
@@ -44,7 +44,7 @@ export function create() {
   };
 }
 
-export function makeEmitter(node) {
+export function alert(node) {
   const adders = new Set(), updaters = new Set(), removers = new Set();
   
   const has = node.has;
@@ -95,6 +95,6 @@ export function makeEmitter(node) {
   return node;
 }
 
-export function createEmitter() {
-  return makeEmitter(create());
+export function alertNode() {
+  return alert(node());
 }
