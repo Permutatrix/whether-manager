@@ -54,14 +54,9 @@ export function create(emit) {
       return false;
     };
   const removeB = (a, b) => remove(b);
-  const clear = emit ?
-    () => {
-      nodeMap.forEach(removeB);
-      adders.clear(); updaters.clear(); removers.clear();
-    } :
-    () => {
-      nodeMap.forEach(removeB);
-    };
+  const clear = () => {
+    nodeMap.forEach(removeB);
+  };
   const has = node => nodeMap.has(node);
   const get = node => nodeMap.get(node);
   const nodes = () => {
@@ -83,17 +78,23 @@ export function create(emit) {
     const onRemove = remover => {
       removers.add(remover);
     };
-    const offAdd = adder => adders.delete(adder);
-    const offUpdate = updater => updaters.delete(updater);
+    const offAdd = adder => adder ? adders.delete(adder) : adders.clear();
+    const offUpdate = updater => updater ? updaters.delete(updater) : updaters.clear();
     const offSet = setter => {
-      const adder = adders.delete(setter);
-      return updaters.delete(setter) || adder;
+      if(setter) {
+        const adder = adders.delete(setter);
+        return updaters.delete(setter) || adder;
+      }
+      adders.clear(); updaters.clear();
     };
-    const offRemove = remover => removers.delete(remover);
+    const offRemove = remover => remover ? removers.delete(remover) : removers.clear();
+    const off = () => {
+      adders.clear(); updaters.clear(); removers.clear();
+    }
     return self = {
       set, remove, clear, has, get, nodes,
       onAdd, onUpdate, onSet, onRemove,
-      offAdd, offUpdate, offSet, offRemove
+      offAdd, offUpdate, offSet, offRemove, off
     };
   }
   return self = {
