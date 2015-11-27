@@ -10,3 +10,11 @@ export function all() {
   }
   return utils.all(nodes.map(getNodes));
 }
+
+export function any() {
+  let nodes = arguments[0];
+  if(!Array.isArray(nodes)) {
+    nodes = utils.copy(arguments);
+  }
+  return utils.any(nodes.map(getNodes));
+}

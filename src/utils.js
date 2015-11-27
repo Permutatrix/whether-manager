@@ -40,3 +40,20 @@ export function all(arrays) {
   }
   return out;
 }
+
+let pushIndex;
+function push1(item) {
+  this[++pushIndex] = item;
+}
+export function any(arrays) {
+  const out = new Set(), len = arrays.length;
+  for(let i = 0; i < len; ++i) {
+    const arr = arrays[i], len = arr.length;
+    for(let j = 0; j < len; ++j) {
+      out.add(arr[j]);
+    }
+  }
+  pushIndex = -1;
+  out.forEach(push1, arrays[0]);
+  return arrays[0];
+}
