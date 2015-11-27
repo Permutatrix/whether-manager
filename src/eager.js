@@ -15,6 +15,21 @@ export function collect(alert, current) {
   })
 }
 
+function construct(nodes, adders, removers) {
+  return {
+    has: node => nodes.indexOf(node) !== -1,
+    nodes: () => nodes,
+    safeNodes: () => utils.copy(nodes),
+    onAdd: adder => { adders.add(adder); },
+    onRemove: remover => { removers.add(remover); },
+    offAdd: adder => adder ? adders.delete(adder) : adders.clear(),
+    offRemove: remover => remover ? removers.delete(remover) : removers.clear(),
+    off: () => {
+      adders.clear(); removers.clear();
+    }
+  }
+}
+
 export function all() {
   const alerts = utils.copy(arguments), len = alerts.length;
   const nodes = has.all(alerts);
@@ -43,18 +58,7 @@ export function all() {
     alerts[i].onRemove(remover);
   }
   
-  return {
-    has: node => nodes.indexOf(node) !== -1,
-    nodes: () => nodes,
-    safeNodes: () => utils.copy(nodes),
-    onAdd: adder => { adders.add(adder); },
-    onRemove: remover => { removers.add(remover); },
-    offAdd: adder => adder ? adders.delete(adder) : adders.clear(),
-    offRemove: remover => remover ? removers.delete(remover) : removers.clear(),
-    off: () => {
-      adders.clear(); removers.clear();
-    }
-  }
+  return construct(nodes, adders, removers);
 }
 
 export function any() {
@@ -84,18 +88,7 @@ export function any() {
     alerts[i].onRemove(remover);
   }
   
-  return {
-    has: node => nodes.indexOf(node) !== -1,
-    nodes: () => nodes,
-    safeNodes: () => utils.copy(nodes),
-    onAdd: adder => { adders.add(adder); },
-    onRemove: remover => { removers.add(remover); },
-    offAdd: adder => adder ? adders.delete(adder) : adders.clear(),
-    offRemove: remover => remover ? removers.delete(remover) : removers.clear(),
-    off: () => {
-      adders.clear(); removers.clear();
-    }
-  }
+  return construct(nodes, adders, removers);
 }
 
 export function andNot(yes, no) {
@@ -124,16 +117,5 @@ export function andNot(yes, no) {
     }
   });
   
-  return {
-    has: node => nodes.indexOf(node) !== -1,
-    nodes: () => nodes,
-    safeNodes: () => utils.copy(nodes),
-    onAdd: adder => { adders.add(adder); },
-    onRemove: remover => { removers.add(remover); },
-    offAdd: adder => adder ? adders.delete(adder) : adders.clear(),
-    offRemove: remover => remover ? removers.delete(remover) : removers.clear(),
-    off: () => {
-      adders.clear(); removers.clear();
-    }
-  }
+  return construct(nodes, adders, removers);
 }
