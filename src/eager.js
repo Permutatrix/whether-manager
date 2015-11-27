@@ -4,12 +4,7 @@ import * as has from './has.js';
 export function collect(alert, current) {
   const nodes = current !== false ? alert.safeNodes() : [];
   alert.onAdd(node => nodes.push(node));
-  alert.onRemove(node => {
-    const index = nodes.indexOf(node);
-    if(index >= 0) {
-      nodes.splice(index, 1);
-    }
-  });
+  alert.onRemove(node => utils.remove(nodes, node));
   return utils.merge(alert, {
     nodes: () => nodes, safeNodes: () => utils.copy(nodes)
   })
@@ -46,9 +41,7 @@ export function all() {
     adders.forEach(utils.evaluate1, node);
   };
   const remover = node => {
-    const index = nodes.indexOf(node);
-    if(index !== -1) {
-      nodes.splice(index, 1);
+    if(utils.remove(nodes, node)) {
       removers.forEach(utils.evaluate1, node);
     }
   };
@@ -102,9 +95,7 @@ export function andNot(yes, no) {
     }
   });
   const remover = node => {
-    const index = nodes.indexOf(node);
-    if(index !== -1) {
-      nodes.splice(index, 1);
+    if(utils.remove(nodes, node)) {
       removers.forEach(utils.evaluate1, node);
     }
   };

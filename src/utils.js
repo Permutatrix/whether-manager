@@ -16,6 +16,15 @@ export function copy(array) {
   return out;
 }
 
+export function remove(array, item) {
+  const index = array.indexOf(item);
+  if(index !== -1) {
+    array.splice(index, 1);
+    return true;
+  }
+  return false;
+}
+
 export function merge() {
   const out = {}, len = arguments.length;
   for(let i = 0; i < len; ++i) {
