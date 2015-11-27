@@ -11,12 +11,15 @@ export function all() {
   return utils.all(nodes.map(getNodes));
 }
 
+function getNodes2(item, index) {
+  return index ? item.nodes() : item.safeNodes();
+}
 export function any() {
   let nodes = arguments[0];
   if(!Array.isArray(nodes)) {
     nodes = utils.copy(arguments);
   }
-  return utils.any(nodes.map(getNodes));
+  return utils.any(nodes.map(getNodes2));
 }
 
 export function andNot(yes, no) {

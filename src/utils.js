@@ -50,7 +50,7 @@ export function all(arrays) {
 }
 
 export function any(arrays) {
-  const out = arrays[0].slice(0), len = arrays.length;
+  const out = arrays[0], len = arrays.length;
   for(let i = 1; i < len; ++i) {
     const arr = arrays[i], len = arr.length;
     for(let j = 0; j < len; ++j) {
