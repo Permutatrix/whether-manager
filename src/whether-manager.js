@@ -1,4 +1,4 @@
-export { node, alert, alertNode} from './node.js';
+export { node, alertify, alertNode} from './node.js';
 import * as lazy from './lazy.js';
 import * as eager from './eager.js';
 import * as has from './has.js';

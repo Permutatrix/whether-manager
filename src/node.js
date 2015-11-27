@@ -36,11 +36,11 @@ export function node() {
   };
 }
 
-export function alert(node) {
+export function alertify(node) {
   const adders = new Set(), updaters = new Set(), removers = new Set();
   
   const nhas = node.has, nset = node.set, nremove = node.remove, nnodes = node.nodes;
-  const set = (node, value) => {
+  const set = node.set = (node, value) => {
     const haveIt = nhas(node);
     if(nset(node, value)) {
       (haveIt ? updaters : adders).forEach(utils.evaluate2, [node, value]);
@@ -48,14 +48,14 @@ export function alert(node) {
     }
     return false;
   };
-  const remove = node => {
+  const remove = node.remove = node => {
     if(nremove(node)) {
       removers.forEach(utils.evaluate1, node);
       return true;
     }
     return false;
   };
-  const clear = () => {
+  const clear = node.clear = () => {
     const nodes = nnodes(), len = nodes.length;
     for(let i = 0; i < len; ++i) {
       remove(nodes[i]);
@@ -96,5 +96,5 @@ export function alert(node) {
 }
 
 export function alertNode() {
-  return alert(node());
+  return alertify(node());
 }
