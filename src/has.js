@@ -18,3 +18,7 @@ export function any() {
   }
   return utils.any(nodes.map(getNodes));
 }
+
+export function andNot(yes, no) {
+  return utils.andNot(yes.safeNodes(), no.nodes());
+}

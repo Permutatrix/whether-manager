@@ -57,3 +57,12 @@ export function any(arrays) {
   out.forEach(push1, arrays[0]);
   return arrays[0];
 }
+
+export function andNot(yes, no) {
+  for(let i = yes.length; i > 0;) {
+    if(no.indexOf(yes[--i]) !== -1) {
+      yes.splice(i, 1);
+    }
+  }
+  return yes;
+}

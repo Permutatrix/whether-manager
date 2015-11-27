@@ -103,3 +103,46 @@ export function any() {
     }
   }
 }
+
+export function andNot(yes, no) {
+  const nodes = has.andNot(yes, no);
+  const adders = new Set(), removers = new Set();
+  
+  yes.onAdd(node => {
+    if(!no.has(node)) {
+      nodes.push(node);
+      adders.forEach(utils.evaluate1, node);
+    }
+  });
+  const remover = node => {
+    const index = nodes.indexOf(node);
+    if(index !== -1) {
+      nodes.splice(index, 1);
+      removers.forEach(utils.evaluate1, node);
+    }
+  };
+  yes.onRemove(remover);
+  no.onAdd(remover);
+  no.onRemove(node => {
+    if(yes.has(node)) {
+      nodes.push(node);
+      adders.forEach(utils.evaluate1, node);
+    }
+  });
+  
+  const onAdd = adder => { adders.add(adder); };
+  const offAdd = adder => adder ? adders.delete(adder) : adders.clear();
+  
+  return {
+    has: node => nodes.indexOf(node) !== -1,
+    nodes: () => nodes,
+    safeNodes: () => utils.copy(nodes),
+    onAdd, onSet: onAdd,
+    onRemove: remover => { removers.add(remover); },
+    offAdd, offSet: offAdd,
+    offRemove: remover => remover ? removers.delete(remover) : removers.clear(),
+    off: () => {
+      adders.clear(); removers.clear();
+    }
+  }
+}
