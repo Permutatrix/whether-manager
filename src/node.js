@@ -36,7 +36,7 @@ export function node() {
   };
 }
 
-export function alertify(node) {
+function alertify(node) {
   const adders = new Set(), updaters = new Set(), removers = new Set();
   
   const nhas = node.has, nset = node.set, nremove = node.remove, nnodes = node.nodes;
