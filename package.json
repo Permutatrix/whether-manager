@@ -1,7 +1,7 @@
 {
   "name": "whether-manager",
   "version": "1.0.0",
-  "description": "manages one-to-one relationships",
+  "description": "manages graphs",
   "main": "whether-manager.js",
   "jsnext:main": "src/whether-manager.js",
   "engines": {
