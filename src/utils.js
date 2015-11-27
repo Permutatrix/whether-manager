@@ -31,7 +31,9 @@ export function merge() {
   for(let i = 0; i < len; ++i) {
     const obj = arguments[i];
     for(let key in obj) {
-      out[key] = obj[key];
+      if(Object.hasOwnProperty.call(obj, key)) {
+        out[key] = obj[key];
+      }
     }
   }
   return out;
