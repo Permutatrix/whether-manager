@@ -35,3 +35,12 @@ export function any() {
     nodes, safeNodes: nodes
   };
 }
+
+export function andNot(yes, no) {
+  const nodes = () => has.andNot(yes, no);
+  
+  return {
+    has: node => (yes.has(node) && !no.has(node)),
+    nodes, safeNodes: nodes
+  };
+}
