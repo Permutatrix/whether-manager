@@ -1,15 +1,5 @@
 import * as utils from './utils.js';
 
-function evaluate1(cb) {
-  cb(this);
-}
-function evaluate2(cb) {
-  cb(this[0], this[1]);
-}
-function pushB(a, b) {
-  this.push(b);
-}
-
 export function node() {
   let self;
   const nodeMap = new Map();
@@ -38,7 +28,7 @@ export function node() {
   const get = node => nodeMap.get(node);
   const nodes = () => {
     let keys = [];
-    nodeMap.forEach(pushB, keys);
+    nodeMap.forEach(utils.pushB, keys);
     return keys;
   };
   return self = {
@@ -53,14 +43,14 @@ export function alert(node) {
   const set = (node, value) => {
     const haveIt = nhas(node);
     if(nset(node, value)) {
-      (haveIt ? updaters : adders).forEach(evaluate2, [node, value]);
+      (haveIt ? updaters : adders).forEach(utils.evaluate2, [node, value]);
       return true;
     }
     return false;
   };
   const remove = node => {
     if(nremove(node)) {
-      removers.forEach(evaluate1, node);
+      removers.forEach(utils.evaluate1, node);
       return true;
     }
     return false;

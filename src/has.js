@@ -6,7 +6,7 @@ function getNodes(item, index) {
 export function all() {
   let nodes = arguments[0];
   if(!Array.isArray(nodes)) {
-    nodes = utils.clone(arguments);
+    nodes = utils.copy(arguments);
   }
   return utils.all(nodes.map(getNodes));
 }

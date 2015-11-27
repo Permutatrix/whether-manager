@@ -1,4 +1,14 @@
-export function clone(array) {
+export function evaluate1(cb) {
+  cb(this);
+}
+export function evaluate2(cb) {
+  cb(this[0], this[1]);
+}
+export function pushB(a, b) {
+  this.push(b);
+}
+
+export function copy(array) {
   const len = array.length, out = Array(len);
   for(let i = 0; i < len; ++i) {
     out[i] = array[i];
