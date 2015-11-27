@@ -38,23 +38,17 @@ export function merge() {
 }
 
 export function all(arrays) {
-  const out = arrays[0], len = arrays.length;
-  for(let i = out.length; i > 0;) {
-    const v = out[--i];
-    for(let j = 1; j < len; ++j) {
-      if(arrays[j].indexOf(v) === -1) {
-        out.splice(i, 1);
-        break;
+  return arrays[0].filter(item => {
+    const len = arrays.length;
+    for(let i = 1; i < len; ++i) {
+      if(arrays[i].indexOf(item) === -1) {
+        return false;
       }
     }
-  }
-  return out;
+    return true;
+  });
 }
 
-let pushIndex;
-function push1(item) {
-  this[++pushIndex] = item;
-}
 export function any(arrays) {
   const out = new Set(), len = arrays.length;
   for(let i = 0; i < len; ++i) {
@@ -63,18 +57,13 @@ export function any(arrays) {
       out.add(arr[j]);
     }
   }
-  pushIndex = -1;
-  out.forEach(push1, arrays[0]);
-  return arrays[0];
+  const arr = [];
+  out.forEach(pushB, arr);
+  return arr;
 }
 
 export function andNot(yes, no) {
-  for(let i = yes.length; i > 0;) {
-    if(no.indexOf(yes[--i]) !== -1) {
-      yes.splice(i, 1);
-    }
-  }
-  return yes;
+  return yes.filter(item => no.indexOf(item) === -1);
 }
 
 export function onFunc(alerts) {

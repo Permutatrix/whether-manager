@@ -1,7 +1,7 @@
 import * as utils from './utils.js';
 
-function getNodes(item, index) {
-  return index ? item.nodes() : item.safeNodes();
+function getNodes(item) {
+  return item.nodes();
 }
 export function all() {
   let nodes = arguments[0];
@@ -20,5 +20,5 @@ export function any() {
 }
 
 export function andNot(yes, no) {
-  return utils.andNot(yes.safeNodes(), no.nodes());
+  return utils.andNot(yes.nodes(), no.nodes());
 }
