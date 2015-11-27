@@ -40,7 +40,7 @@ export function node() {
     return keys;
   };
   return self = {
-    set, remove, clear, has, get, nodes
+    set, remove, clear, has, get, nodes, safeNodes: nodes
   };
 }
 
