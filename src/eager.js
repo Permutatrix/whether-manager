@@ -43,16 +43,13 @@ export function all() {
     alerts[i].onRemove(remover);
   }
   
-  const onAdd = adder => { adders.add(adder); };
-  const offAdd = adder => adder ? adders.delete(adder) : adders.clear();
-  
   return {
     has: node => nodes.indexOf(node) !== -1,
     nodes: () => nodes,
     safeNodes: () => utils.copy(nodes),
-    onAdd, onSet: onAdd,
+    onAdd: adder => { adders.add(adder); },
     onRemove: remover => { removers.add(remover); },
-    offAdd, offSet: offAdd,
+    offAdd: adder => adder ? adders.delete(adder) : adders.clear(),
     offRemove: remover => remover ? removers.delete(remover) : removers.clear(),
     off: () => {
       adders.clear(); removers.clear();
@@ -87,16 +84,13 @@ export function any() {
     alerts[i].onRemove(remover);
   }
   
-  const onAdd = adder => { adders.add(adder); };
-  const offAdd = adder => adder ? adders.delete(adder) : adders.clear();
-  
   return {
     has: node => nodes.indexOf(node) !== -1,
     nodes: () => nodes,
     safeNodes: () => utils.copy(nodes),
-    onAdd, onSet: onAdd,
+    onAdd: adder => { adders.add(adder); },
     onRemove: remover => { removers.add(remover); },
-    offAdd, offSet: offAdd,
+    offAdd: adder => adder ? adders.delete(adder) : adders.clear(),
     offRemove: remover => remover ? removers.delete(remover) : removers.clear(),
     off: () => {
       adders.clear(); removers.clear();
@@ -130,16 +124,13 @@ export function andNot(yes, no) {
     }
   });
   
-  const onAdd = adder => { adders.add(adder); };
-  const offAdd = adder => adder ? adders.delete(adder) : adders.clear();
-  
   return {
     has: node => nodes.indexOf(node) !== -1,
     nodes: () => nodes,
     safeNodes: () => utils.copy(nodes),
-    onAdd, onSet: onAdd,
+    onAdd: adder => { adders.add(adder); },
     onRemove: remover => { removers.add(remover); },
-    offAdd, offSet: offAdd,
+    offAdd: adder => adder ? adders.delete(adder) : adders.clear(),
     offRemove: remover => remover ? removers.delete(remover) : removers.clear(),
     off: () => {
       adders.clear(); removers.clear();
