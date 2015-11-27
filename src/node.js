@@ -1,3 +1,5 @@
+import * as utils from './utils.js';
+
 function evaluate1(cb) {
   cb(this);
 }
@@ -47,52 +49,60 @@ export function node() {
 export function alert(node) {
   const adders = new Set(), updaters = new Set(), removers = new Set();
   
-  const has = node.has;
-  const set = node.set;
-  node.set = (node, value) => {
-    const haveIt = has(node);
-    if(set(node, value)) {
+  const nhas = node.has, nset = node.set, nremove = node.remove, nnodes = node.nodes;
+  const set = (node, value) => {
+    const haveIt = nhas(node);
+    if(nset(node, value)) {
       (haveIt ? updaters : adders).forEach(evaluate2, [node, value]);
       return true;
     }
     return false;
   };
-  const remove = node.remove;
-  node.remove = node => {
-    if(remove(node)) {
+  const remove = node => {
+    if(nremove(node)) {
       removers.forEach(evaluate1, node);
       return true;
     }
     return false;
   };
+  const clear = () => {
+    const nodes = nnodes(), len = nodes.length;
+    for(let i = 0; i < len; ++i) {
+      remove(nodes[i]);
+    }
+  };
   
-  node.onAdd = adder => {
+  const onAdd = adder => {
     adders.add(adder);
   };
-  node.onUpdate = updater => {
+  const onUpdate = updater => {
     updaters.add(updater);
   };
-  node.onSet = setter => {
+  const onSet = setter => {
     adders.add(setter);
     updaters.add(setter);
   };
-  node.onRemove = remover => {
+  const onRemove = remover => {
     removers.add(remover);
   };
-  node.offAdd = adder => adder ? adders.delete(adder) : adders.clear();
-  node.offUpdate = updater => updater ? updaters.delete(updater) : updaters.clear();
-  node.offSet = setter => {
+  const offAdd = adder => adder ? adders.delete(adder) : adders.clear();
+  const offUpdate = updater => updater ? updaters.delete(updater) : updaters.clear();
+  const offSet = setter => {
     if(setter) {
       const adder = adders.delete(setter);
       return updaters.delete(setter) || adder;
     }
     adders.clear(); updaters.clear();
   };
-  node.offRemove = remover => remover ? removers.delete(remover) : removers.clear();
-  node.off = () => {
+  const offRemove = remover => remover ? removers.delete(remover) : removers.clear();
+  const off = () => {
     adders.clear(); updaters.clear(); removers.clear();
   }
-  return node;
+  return utils.merge(node, {
+    set, remove, clear,
+    onAdd, onUpdate, onSet, onRemove,
+    offAdd, offUpdate, offSet, offRemove, off
+  });
 }
 
 export function alertNode() {
