@@ -1,11 +1,12 @@
-export function evaluate1(cb) {
-  cb(this);
-}
-export function evaluate2(cb) {
-  cb(this[0], this[1]);
-}
 export function pushB(a, b) {
   this.push(b);
+}
+
+export function executeAll(array, arg) {
+  const len = array.length;
+  for(let i = 0; i < len; ++i) {
+    array[i](arg);
+  }
 }
 
 export function copy(array) {
@@ -74,4 +75,14 @@ export function andNot(yes, no) {
     }
   }
   return yes;
+}
+
+export function onFunc(alerts) {
+  return alert => {
+    alerts.push(alert);
+  };
+}
+
+export function offFunc(alerts) {
+  return alert => alert ? remove(alerts, alert) : alerts.length = 0;
 }

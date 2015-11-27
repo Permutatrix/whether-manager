@@ -37,20 +37,23 @@ export function node() {
 }
 
 function alertify(node) {
-  const adders = new Set(), updaters = new Set(), removers = new Set();
+  const adders = [], updaters = [], removers = [];
   
   const nhas = node.has, nset = node.set, nremove = node.remove, nnodes = node.nodes;
   const set = node.set = (node, value) => {
     const haveIt = nhas(node);
     if(nset(node, value)) {
-      (haveIt ? updaters : adders).forEach(utils.evaluate2, [node, value]);
+      const alerts = (haveIt ? updaters : adders), len = alerts.length;
+      for(let i = 0; i < len; ++i) {
+        alerts[i](node, value);
+      }
       return true;
     }
     return false;
   };
   const remove = node.remove = node => {
     if(nremove(node)) {
-      removers.forEach(utils.evaluate1, node);
+      utils.executeAll(removers, node);
       return true;
     }
     return false;
@@ -62,31 +65,25 @@ function alertify(node) {
     }
   };
   
-  const onAdd = adder => {
-    adders.add(adder);
-  };
-  const onUpdate = updater => {
-    updaters.add(updater);
-  };
+  const onAdd = utils.onFunc(adders);
+  const onUpdate = utils.onFunc(updaters);
   const onSet = setter => {
-    adders.add(setter);
-    updaters.add(setter);
+    adders.push(setter);
+    updaters.push(setter);
   };
-  const onRemove = remover => {
-    removers.add(remover);
-  };
-  const offAdd = adder => adder ? adders.delete(adder) : adders.clear();
-  const offUpdate = updater => updater ? updaters.delete(updater) : updaters.clear();
+  const onRemove = utils.onFunc(removers);
+  const offAdd = utils.offFunc(adders);
+  const offUpdate = utils.offFunc(updaters);
   const offSet = setter => {
     if(setter) {
-      const adder = adders.delete(setter);
-      return updaters.delete(setter) || adder;
+      const adder = utils.remove(adders, setter);
+      return utils.remove(updaters, setter) || adder;
     }
-    adders.clear(); updaters.clear();
+    adders.length = updaters.length = 0;
   };
-  const offRemove = remover => remover ? removers.delete(remover) : removers.clear();
+  const offRemove = utils.offFunc(removers);
   const off = () => {
-    adders.clear(); updaters.clear(); removers.clear();
+    adders.length = updaters.length = removers.length = 0;
   }
   return utils.merge(node, {
     set, remove, clear,

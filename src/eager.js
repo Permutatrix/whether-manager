@@ -15,12 +15,12 @@ function construct(nodes, adders, removers) {
     has: node => nodes.indexOf(node) !== -1,
     nodes: () => nodes,
     safeNodes: () => utils.copy(nodes),
-    onAdd: adder => { adders.add(adder); },
-    onRemove: remover => { removers.add(remover); },
-    offAdd: adder => adder ? adders.delete(adder) : adders.clear(),
-    offRemove: remover => remover ? removers.delete(remover) : removers.clear(),
+    onAdd: utils.onFunc(adders),
+    onRemove: utils.onFunc(removers),
+    offAdd: utils.offFunc(adders),
+    offRemove: utils.offFunc(removers),
     off: () => {
-      adders.clear(); removers.clear();
+      adders.length = removers.length = 0;
     }
   }
 }
@@ -28,7 +28,7 @@ function construct(nodes, adders, removers) {
 export function all() {
   const alerts = utils.copy(arguments), len = alerts.length;
   const nodes = has.all(alerts);
-  const adders = new Set(), removers = new Set();
+  const adders = [], removers = [];
   
   const adder = node => {
     const len = alerts.length;
@@ -38,11 +38,11 @@ export function all() {
       }
     }
     nodes.push(node);
-    adders.forEach(utils.evaluate1, node);
+    utils.executeAll(adders, node);
   };
   const remover = node => {
     if(utils.remove(nodes, node)) {
-      removers.forEach(utils.evaluate1, node);
+      utils.executeAll(removers, node);
     }
   };
   
@@ -57,12 +57,12 @@ export function all() {
 export function any() {
   const alerts = utils.copy(arguments), len = alerts.length;
   const nodes = has.any(alerts);
-  const adders = new Set(), removers = new Set();
+  const adders = [], removers = [];
   
   const adder = node => {
     if(nodes.indexOf(node) === -1) {
       nodes.push(node);
-      adders.forEach(utils.evaluate1, node);
+      utils.executeAll(adders, node);
     }
   };
   const remover = node => {
@@ -73,7 +73,7 @@ export function any() {
       }
     }
     nodes.splice(nodes.indexOf(node), 1);
-    removers.forEach(utils.evaluate1, node);
+    utils.executeAll(removers, node);
   };
   
   for(let i = 0; i < len; ++i) {
@@ -86,17 +86,17 @@ export function any() {
 
 export function andNot(yes, no) {
   const nodes = has.andNot(yes, no);
-  const adders = new Set(), removers = new Set();
+  const adders = [], removers = [];
   
   yes.onAdd(node => {
     if(!no.has(node)) {
       nodes.push(node);
-      adders.forEach(utils.evaluate1, node);
+      utils.executeAll(adders, node);
     }
   });
   const remover = node => {
     if(utils.remove(nodes, node)) {
-      removers.forEach(utils.evaluate1, node);
+      utils.executeAll(removers, node);
     }
   };
   yes.onRemove(remover);
@@ -104,7 +104,7 @@ export function andNot(yes, no) {
   no.onRemove(node => {
     if(yes.has(node)) {
       nodes.push(node);
-      adders.forEach(utils.evaluate1, node);
+      utils.executeAll(adders, node);
     }
   });
   
