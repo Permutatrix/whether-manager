@@ -17,3 +17,21 @@ export function all() {
     nodes, safeNodes: nodes
   };
 }
+
+export function any() {
+  const items = utils.copy(arguments);
+  const nodes = () => has.any(items);
+  
+  return {
+    has: node => {
+      const len = items.length;
+      for(let i = 0; i < len; ++i) {
+        if(items[i].has(node)) {
+          return true;
+        }
+      }
+      return false;
+    },
+    nodes, safeNodes: nodes
+  };
+}
