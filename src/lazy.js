@@ -1,3 +1,5 @@
+// Hey. I could fetch these nodes in ten microseconds flat!
+
 import * as has from './has.js';
 
 export function all() {
