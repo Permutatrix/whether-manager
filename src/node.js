@@ -20,14 +20,13 @@ export function node() {
     }
     return false;
   };
-  const removeB = (a, b) => remove(b);
   const clear = () => {
-    nodeMap.forEach(removeB);
+    nodeMap.forEach((a, b) => remove(b));
   };
   const has = node => nodeMap.has(node);
   const get = node => nodeMap.get(node);
   const nodes = () => {
-    let keys = [];
+    const keys = [];
     nodeMap.forEach(utils.pushB, keys);
     return keys;
   };
@@ -40,11 +39,11 @@ function alertify(node) {
   const adders = [], updaters = [], removers = [];
   
   const nhas = node.has, nset = node.set, nremove = node.remove, nnodes = node.nodes;
-  const set = node.set = (node, value) => {
+  node.set = (node, value) => {
     const haveIt = nhas(node);
     if(nset(node, value)) {
-      const alerts = (haveIt ? updaters : adders), len = alerts.length;
-      for(let i = 0; i < len; ++i) {
+      const alerts = (haveIt ? updaters : adders);
+      for(let i = 0, len = alerts.length; i < len; ++i) {
         alerts[i](node, value);
       }
       return true;
@@ -58,40 +57,20 @@ function alertify(node) {
     }
     return false;
   };
-  const clear = node.clear = () => {
-    const nodes = nnodes(), len = nodes.length;
-    for(let i = 0; i < len; ++i) {
+  node.clear = () => {
+    const nodes = nnodes();
+    for(let i = 0, len = nodes.length; i < len; ++i) {
       remove(nodes[i]);
     }
   };
   
-  const onAdd = utils.onFunc(adders);
-  const onUpdate = utils.onFunc(updaters);
-  const onSet = setter => {
-    adders.push(setter);
-    updaters.push(setter);
-  };
-  const onRemove = utils.onFunc(removers);
-  const offAdd = utils.offFunc(adders);
-  const offUpdate = utils.offFunc(updaters);
-  const offSet = setter => {
-    if(setter) {
-      const adder = utils.remove(adders, setter);
-      return utils.remove(updaters, setter) || adder;
-    }
-    adders.length = updaters.length = 0;
-  };
-  const offRemove = utils.offFunc(removers);
-  const off = () => {
-    adders.length = updaters.length = removers.length = 0;
-  }
-  return utils.merge(node, {
-    set, remove, clear,
-    onAdd, onUpdate, onSet, onRemove,
-    offAdd, offUpdate, offSet, offRemove, off
-  });
+  const alerts = { 'add': adders, 'update': updaters, 'remove': removers };
+  node.on = utils.onFunc(alerts);
+  node.off = utils.offFunc(alerts);
+  
+  return node;
 }
 
-export function alertNode() {
+export function supernode() {
   return alertify(node());
 }

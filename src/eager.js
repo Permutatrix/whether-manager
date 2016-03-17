@@ -3,37 +3,30 @@ import * as has from './has.js';
 
 export function collect(alert, current) {
   const nodes = current !== false ? alert.safeNodes() : [];
-  alert.onAdd(node => nodes.push(node));
-  alert.onRemove(node => utils.remove(nodes, node));
+  alert.on('add', node => nodes.push(node));
+  alert.on('remove', node => utils.remove(nodes, node));
   return utils.merge(alert, {
     nodes: () => nodes, safeNodes: () => utils.copy(nodes)
   })
 }
 
-function construct(nodes, adders, removers) {
+function construct(nodes, alerts) {
   return {
     has: node => nodes.indexOf(node) !== -1,
     nodes: () => nodes,
     safeNodes: () => utils.copy(nodes),
-    onAdd: utils.onFunc(adders),
-    onRemove: utils.onFunc(removers),
-    offAdd: utils.offFunc(adders),
-    offRemove: utils.offFunc(removers),
-    off: () => {
-      adders.length = removers.length = 0;
-    }
+    on: utils.onFunc(alerts),
+    off: utils.offFunc(alerts)
   }
 }
 
-export function all() {
-  const alerts = utils.copy(arguments), len = alerts.length;
-  const nodes = has.all(alerts);
+export function all(...items) {
+  const nodes = has.all(items);
   const adders = [], removers = [];
   
   const adder = node => {
-    const len = alerts.length;
-    for(let i = 0; i < len; ++i) {
-      if(!alerts[i].has(node)) {
+    for(let i = 0, len = items.length; i < len; ++i) {
+      if(!items[i].has(node)) {
         return;
       }
     }
@@ -46,17 +39,16 @@ export function all() {
     }
   };
   
-  for(let i = 0; i < len; ++i) {
-    alerts[i].onAdd(adder);
-    alerts[i].onRemove(remover);
+  for(let i = 0, len = items.length; i < len; ++i) {
+    items[i].on('add', adder);
+    items[i].on('remove', remover);
   }
   
-  return construct(nodes, adders, removers);
+  return construct(nodes, { 'add': adders, 'remove': removers });
 }
 
-export function any() {
-  const alerts = utils.copy(arguments), len = alerts.length;
-  const nodes = has.any(alerts);
+export function any(...items) {
+  const nodes = has.any(items);
   const adders = [], removers = [];
   
   const adder = node => {
@@ -66,9 +58,8 @@ export function any() {
     }
   };
   const remover = node => {
-    const len = alerts.length;
-    for(let i = 0; i < len; ++i) {
-      if(alerts[i].has(node)) {
+    for(let i = 0, len = items.length; i < len; ++i) {
+      if(items[i].has(node)) {
         return;
       }
     }
@@ -76,19 +67,19 @@ export function any() {
     utils.executeAll(removers, node);
   };
   
-  for(let i = 0; i < len; ++i) {
-    alerts[i].onAdd(adder);
-    alerts[i].onRemove(remover);
+  for(let i = 0, len = items.length; i < len; ++i) {
+    items[i].on('add', adder);
+    items[i].on('remove', remover);
   }
   
-  return construct(nodes, adders, removers);
+  return construct(nodes, { 'add': adders, 'remove': removers });
 }
 
 export function andNot(yes, no) {
   const nodes = has.andNot(yes, no);
   const adders = [], removers = [];
   
-  yes.onAdd(node => {
+  yes.on('add', node => {
     if(!no.has(node)) {
       nodes.push(node);
       utils.executeAll(adders, node);
@@ -99,14 +90,14 @@ export function andNot(yes, no) {
       utils.executeAll(removers, node);
     }
   };
-  yes.onRemove(remover);
-  no.onAdd(remover);
-  no.onRemove(node => {
+  yes.on('remove', remover);
+  no.on('add', remover);
+  no.on('remove', node => {
     if(yes.has(node)) {
       nodes.push(node);
       utils.executeAll(adders, node);
     }
   });
   
-  return construct(nodes, adders, removers);
+  return construct(nodes, { 'add': adders, 'remove': removers });
 }

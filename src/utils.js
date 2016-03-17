@@ -3,8 +3,7 @@ export function pushB(a, b) {
 }
 
 export function executeAll(array, arg) {
-  const len = array.length;
-  for(let i = 0; i < len; ++i) {
+  for(let i = 0, len = array.length; i < len; ++i) {
     array[i](arg);
   }
 }
@@ -27,13 +26,11 @@ export function remove(array, item) {
 }
 
 export function merge() {
-  const out = {}, len = arguments.length;
-  for(let i = 0; i < len; ++i) {
-    const obj = arguments[i];
-    for(let key in obj) {
-      if(Object.hasOwnProperty.call(obj, key)) {
-        out[key] = obj[key];
-      }
+  const out = {};
+  for(let i = 0, len = arguments.length; i < len; ++i) {
+    const obj = arguments[i], keys = Object.keys(obj);
+    for(let i = 0, len = keys.length; i < len; ++i) {
+      out[key] = obj[key];
     }
   }
   return out;
@@ -41,8 +38,7 @@ export function merge() {
 
 export function all(arrays) {
   return arrays[0].filter(item => {
-    const len = arrays.length;
-    for(let i = 1; i < len; ++i) {
+    for(let i = 1, len = arrays.length; i < len; ++i) {
       if(arrays[i].indexOf(item) === -1) {
         return false;
       }
@@ -52,10 +48,10 @@ export function all(arrays) {
 }
 
 export function any(arrays) {
-  const out = arrays[0], len = arrays.length;
-  for(let i = 1; i < len; ++i) {
-    const arr = arrays[i], len = arr.length;
-    for(let j = 0; j < len; ++j) {
+  const out = arrays[0];
+  for(let i = 1, len = arguments.length; i < len; ++i) {
+    const arr = arrays[i];
+    for(let j = 0, len = arr.length; j < len; ++j) {
       const item = arr[j];
       if(out.indexOf(item) === -1) {
         out.push(item);
@@ -70,11 +66,49 @@ export function andNot(yes, no) {
 }
 
 export function onFunc(alerts) {
-  return alert => {
-    alerts.push(alert);
+  return function() {
+    const len = arguments.length - 1, alert = arguments[len];
+    if(len !== 0) {
+      for(let i = 0; i < len; ++i) {
+        alerts[arguments[i]].push(alert);
+      }
+    } else { // no types passed
+      // add this alert to all types
+      const types = Object.keys(alerts);
+      for(let i = 0, len = types.length; i < len; ++i) {
+        alerts[types[i]].push(alert);
+      }
+    }
   };
 }
 
 export function offFunc(alerts) {
-  return alert => alert ? remove(alerts, alert) : alerts.length = 0;
+  return function() {
+    let len = arguments.length - 1;
+    if(len === -1) { // no arguments passed
+      // remove all alerts from all types
+      const types = Object.keys(alerts);
+      for(let i = 0, len = types.length; i < len; ++i) {
+        alerts[types[i]].length = 0;
+      }
+    } else {
+      let alert = arguments[len], types = arguments;
+      if(typeof alert !== 'function') { // no function passed
+        // remove all alerts for this type(s)
+        alert = undefined;
+        ++len;
+      } else if(len === 0) { // no alert types passed
+        // remove this alert from all types
+        types = Object.keys(alerts);
+        len = types.length;
+      }
+      for(let i = 0; i < len; ++i) {
+        if(alert) {
+          remove(alerts[types[i]], alert);
+        } else {
+          alerts[types[i]].length = 0;
+        }
+      }
+    }
+  };
 }

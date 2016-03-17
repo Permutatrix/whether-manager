@@ -2,14 +2,12 @@
 
 import * as has from './has.js';
 
-export function all() {
-  const items = utils.copy(arguments);
+export function all(...items) {
   const nodes = () => has.all(items);
   
   return {
     has: node => {
-      const len = items.length;
-      for(let i = 0; i < len; ++i) {
+      for(let i = 0, len = items.length; i < len; ++i) {
         if(!items[i].has(node)) {
           return false;
         }
@@ -20,14 +18,12 @@ export function all() {
   };
 }
 
-export function any() {
-  const items = utils.copy(arguments);
+export function any(...items) {
   const nodes = () => has.any(items);
   
   return {
     has: node => {
-      const len = items.length;
-      for(let i = 0; i < len; ++i) {
+      for(let i = 0, len = items.length; i < len; ++i) {
         if(items[i].has(node)) {
           return true;
         }

@@ -3,23 +3,32 @@ import * as utils from './utils.js';
 function getNodes(item) {
   return item.nodes();
 }
-export function all() {
-  let nodes = arguments[0];
-  if(!Array.isArray(nodes)) {
-    nodes = utils.copy(arguments);
+export function all(nodes_) {
+  if(Array.isArray(nodes_)) {
+    return utils.all(nodes_.map(getNodes));
+  } else {
+    const len = arguments.length, nodes = Array(len);
+    for(let i = 0; i < len; ++i) {
+      nodes[i] = arguments[i].nodes();
+    }
+    return utils.all(nodes);
   }
-  return utils.all(nodes.map(getNodes));
 }
 
 function getNodes2(item, index) {
   return index ? item.nodes() : item.safeNodes();
 }
-export function any() {
-  let nodes = arguments[0];
-  if(!Array.isArray(nodes)) {
-    nodes = utils.copy(arguments);
+export function any(nodes_) {
+  if(Array.isArray(nodes_)) {
+    return utils.any(nodes_.map(getNodes2));
+  } else {
+    const len = arguments.length, nodes = Array(len);
+    nodes[0] = nodes_.safeNodes();
+    for(let i = 1; i < len; ++i) {
+      nodes[i] = arguments[i].nodes();
+    }
+    return utils.any(nodes);
   }
-  return utils.any(nodes.map(getNodes2));
 }
 
 export function andNot(yes, no) {
