@@ -30,7 +30,7 @@ export function merge() {
   for(let i = 0, len = arguments.length; i < len; ++i) {
     const obj = arguments[i], keys = Object.keys(obj);
     for(let i = 0, len = keys.length; i < len; ++i) {
-      out[key] = obj[key];
+      out[keys[i]] = obj[keys[i]];
     }
   }
   return out;
