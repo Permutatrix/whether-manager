@@ -49,7 +49,7 @@ export function all(arrays) {
 
 export function any(arrays) {
   const out = arrays[0];
-  for(let i = 1, len = arguments.length; i < len; ++i) {
+  for(let i = 1, len = arrays.length; i < len; ++i) {
     const arr = arrays[i];
     for(let j = 0, len = arr.length; j < len; ++j) {
       const item = arr[j];
