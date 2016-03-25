@@ -12,11 +12,10 @@ export function collect(alert) {
 }
 
 function construct(minion, nodes, alerts) {
-  return utils.merge(minion, {
-    nodes: () => nodes,
-    on: utils.onFunc(alerts),
-    off: utils.offFunc(alerts)
-  });
+  minion.nodes = () => nodes;
+  minion.on = utils.onFunc(alerts);
+  minion.off = utils.offFunc(alerts);
+  return minion;
 }
 
 export function all(...items) {
