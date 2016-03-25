@@ -48,6 +48,9 @@ export function all(arrays) {
 }
 
 export function any(arrays) {
+  if(arrays.length === 0) {
+    return [];
+  }
   const out = arrays[0];
   for(let i = 1, len = arrays.length; i < len; ++i) {
     const arr = arrays[i];

@@ -22,7 +22,11 @@ export function any(nodes_) {
   if(Array.isArray(nodes_)) {
     return utils.any(nodes_.map(getNodes2));
   } else {
-    const len = arguments.length, nodes = Array(len);
+    const len = arguments.length;
+    if(len === 0) {
+      return [];
+    }
+    const nodes = Array(len);
     nodes[0] = nodes_.safeNodes();
     for(let i = 1; i < len; ++i) {
       nodes[i] = arguments[i].nodes();
