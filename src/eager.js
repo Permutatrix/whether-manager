@@ -1,23 +1,22 @@
 import * as utils from './utils.js';
 import * as has from './has.js';
+import * as lazy from './lazy.js';
 
-export function collect(alert, current) {
-  const nodes = current !== false ? alert.safeNodes() : [];
+export function collect(alert) {
+  const nodes = alert.safeNodes();
   alert.on('add', node => nodes.push(node));
   alert.on('remove', node => utils.remove(nodes, node));
   return utils.merge(alert, {
-    nodes: () => nodes, safeNodes: () => utils.copy(nodes)
+    nodes: () => nodes
   })
 }
 
-function construct(nodes, alerts) {
-  return {
-    has: node => nodes.indexOf(node) !== -1,
+function construct(minion, nodes, alerts) {
+  return utils.merge(minion, {
     nodes: () => nodes,
-    safeNodes: () => utils.copy(nodes),
     on: utils.onFunc(alerts),
     off: utils.offFunc(alerts)
-  }
+  });
 }
 
 export function all(...items) {
@@ -44,7 +43,7 @@ export function all(...items) {
     items[i].on('remove', remover);
   }
   
-  return construct(nodes, { 'add': adders, 'remove': removers });
+  return construct(lazy.all(...items), nodes, { 'add': adders, 'remove': removers });
 }
 
 export function any(...items) {
@@ -72,7 +71,7 @@ export function any(...items) {
     items[i].on('remove', remover);
   }
   
-  return construct(nodes, { 'add': adders, 'remove': removers });
+  return construct(lazy.any(...items), nodes, { 'add': adders, 'remove': removers });
 }
 
 export function andNot(yes, no) {
@@ -99,5 +98,5 @@ export function andNot(yes, no) {
     }
   });
   
-  return construct(nodes, { 'add': adders, 'remove': removers });
+  return construct(lazy.andNot(yes, no), nodes, { 'add': adders, 'remove': removers });
 }
