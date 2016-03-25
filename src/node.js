@@ -1,10 +1,15 @@
 import * as utils from './utils.js';
 
-export function node() {
+const allNodes = new WeakSet();
+
+function basicNode() {
   let self;
   const nodeMap = new Map();
   
   const set = (node, value) => {
+    if(!allNodes.has(node)) {
+      throw Error("Attempted to link a node to a non-node!");
+    }
     if((value === undefined && !nodeMap.has(node)) || nodeMap.get(node) !== value) {
       nodeMap.set(node, value);
       node.set(self, value);
@@ -28,12 +33,19 @@ export function node() {
     return keys;
   };
   
-  return self = {
+  self = {
     set, remove, has, get, nodes, safeNodes: nodes
   };
+  allNodes.add(self);
+  return self;
 }
 
-function alertify(node) {
+export function node() {
+  return Object.freeze(basicNode());
+}
+
+export function supernode() {
+  const node = basicNode();
   const adders = [], updaters = [], removers = [];
   
   const nhas = node.has, nset = node.set, nremove = node.remove, nnodes = node.nodes;
@@ -60,9 +72,5 @@ function alertify(node) {
   node.on = utils.onFunc(alerts);
   node.off = utils.offFunc(alerts);
   
-  return node;
-}
-
-export function supernode() {
-  return alertify(node());
+  return Object.freeze(node);
 }
