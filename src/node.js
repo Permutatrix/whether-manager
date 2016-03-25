@@ -2,7 +2,7 @@ import * as utils from './utils.js';
 
 const allNodes = new WeakSet();
 
-function basicNode() {
+function basicNode(name) {
   let self;
   const nodeMap = new Map();
   
@@ -34,18 +34,18 @@ function basicNode() {
   };
   
   self = {
-    set, remove, has, get, nodes, safeNodes: nodes
+    name, set, remove, has, get, nodes, safeNodes: nodes
   };
   allNodes.add(self);
   return self;
 }
 
-export function node() {
-  return Object.freeze(basicNode());
+export function node(name) {
+  return Object.freeze(basicNode(name));
 }
 
-export function supernode() {
-  const node = basicNode();
+export function supernode(name) {
+  const node = basicNode(name);
   const adders = [], updaters = [], removers = [];
   
   const nhas = node.has, nset = node.set, nremove = node.remove, nnodes = node.nodes;
