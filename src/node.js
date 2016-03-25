@@ -20,9 +20,6 @@ export function node() {
     }
     return false;
   };
-  const clear = () => {
-    nodeMap.forEach((a, b) => remove(b));
-  };
   const has = node => nodeMap.has(node);
   const get = node => nodeMap.get(node);
   const nodes = () => {
@@ -30,8 +27,9 @@ export function node() {
     nodeMap.forEach(utils.pushB, keys);
     return keys;
   };
+  
   return self = {
-    set, remove, clear, has, get, nodes, safeNodes: nodes
+    set, remove, has, get, nodes, safeNodes: nodes
   };
 }
 
@@ -56,12 +54,6 @@ function alertify(node) {
       return true;
     }
     return false;
-  };
-  node.clear = () => {
-    const nodes = nnodes();
-    for(let i = 0, len = nodes.length; i < len; ++i) {
-      remove(nodes[i]);
-    }
   };
   
   const alerts = { 'add': adders, 'update': updaters, 'remove': removers };
