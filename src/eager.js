@@ -8,7 +8,7 @@ export function collect(alert) {
   alert.on('remove', node => utils.remove(nodes, node));
   return utils.merge(alert, {
     nodes: () => nodes
-  })
+  });
 }
 
 function construct(minion, nodes, alerts) {
