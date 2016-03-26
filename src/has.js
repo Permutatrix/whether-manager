@@ -2,7 +2,7 @@ import * as utils from './utils.js';
 
 export function all(nodes) {
   if(Array.isArray(nodes)) {
-    return nodes[0].getNodes().filter(item => {
+    return nodes[0].getNodes(false).filter(item => {
       for(let i = 1, len = nodes.length; i < len; ++i) {
         if(!nodes[i].has(item)) {
           return false;
@@ -35,5 +35,5 @@ export function any(nodes) {
 }
 
 export function andNot(yes, no) {
-  return yes.getNodes().filter(item => !no.has(item));
+  return yes.getNodes(false).filter(item => !no.has(item));
 }

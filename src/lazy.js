@@ -31,7 +31,6 @@ export function any(...items) {
 }
 
 export function andNot(yes, no) {
-  
   return {
     has: node => (yes.has(node) && !no.has(node)),
     getNodes: () => has.andNot(yes, no)

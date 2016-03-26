@@ -28,7 +28,7 @@ function basicNode(name) {
   };
   const has = node => nodes.indexOf(node) !== -1; // faster than nodeMap.has
   const get = node => nodeMap.get(node);
-  const getNodes = copy => copy ? utils.copy(nodes) : nodes;
+  const getNodes = copy => copy === undefined || copy ? utils.copy(nodes) : nodes;
   
   self = {
     name, set, remove, has, get, nodes, getNodes
