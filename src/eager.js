@@ -2,17 +2,8 @@ import * as utils from './utils.js';
 import * as has from './has.js';
 import * as lazy from './lazy.js';
 
-export function collect(alert) {
-  const nodes = alert.safeNodes();
-  alert.on('add', node => nodes.push(node));
-  alert.on('remove', node => utils.remove(nodes, node));
-  return utils.merge(alert, {
-    nodes: () => nodes
-  });
-}
-
 function construct(minion, nodes, alerts) {
-  minion.nodes = () => nodes;
+  minion.nodes = nodes;
   minion.on = utils.onFunc(alerts);
   minion.off = utils.offFunc(alerts);
   return minion;

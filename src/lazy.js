@@ -3,8 +3,6 @@
 import * as has from './has.js';
 
 export function all(...items) {
-  const nodes = () => has.all(items);
-  
   return {
     has: node => {
       for(let i = 0, len = items.length; i < len; ++i) {
@@ -14,13 +12,11 @@ export function all(...items) {
       }
       return true;
     },
-    nodes, safeNodes: nodes
+    getNodes: () => has.all(items)
   };
 }
 
 export function any(...items) {
-  const nodes = () => has.any(items);
-  
   return {
     has: node => {
       for(let i = 0, len = items.length; i < len; ++i) {
@@ -30,15 +26,14 @@ export function any(...items) {
       }
       return false;
     },
-    nodes, safeNodes: nodes
+    getNodes: () => has.any(items)
   };
 }
 
 export function andNot(yes, no) {
-  const nodes = () => has.andNot(yes, no);
   
   return {
     has: node => (yes.has(node) && !no.has(node)),
-    nodes, safeNodes: nodes
+    getNodes: () => has.andNot(yes, no)
   };
 }

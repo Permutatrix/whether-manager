@@ -1,32 +1,39 @@
 import * as utils from './utils.js';
 
-function getNodes(item) {
-  return item.safeNodes();
-}
-export function all(nodes_) {
-  if(Array.isArray(nodes_)) {
-    return utils.all(nodes_.map(getNodes));
+export function all(nodes) {
+  if(Array.isArray(nodes)) {
+    return nodes[0].getNodes().filter(item => {
+      for(let i = 1, len = nodes.length; i < len; ++i) {
+        if(!nodes[i].has(item)) {
+          return false;
+        }
+      }
+      return true;
+    });
   } else {
-    const len = arguments.length, nodes = Array(len);
+    const len = arguments.length, nodes_ = Array(len);
     for(let i = 0; i < len; ++i) {
-      nodes[i] = arguments[i].nodes();
+      nodes_[i] = arguments[i];
     }
-    return utils.all(nodes);
+    return all(nodes_);
   }
 }
 
-export function any(nodes_) {
-  if(Array.isArray(nodes_)) {
-    return utils.any(nodes_.map(getNodes));
+function getNodes(item, index) {
+  return item.getNodes(index === 0);
+}
+export function any(nodes) {
+  if(Array.isArray(nodes)) {
+    return utils.any(nodes.map(getNodes));
   } else {
-    const len = arguments.length, nodes = Array(len);
+    const len = arguments.length, nodes_ = Array(len);
     for(let i = 0; i < len; ++i) {
-      nodes[i] = arguments[i].safeNodes();
+      nodes_[i] = arguments[i].getNodes(i === 0);
     }
-    return utils.any(nodes);
+    return utils.any(nodes_);
   }
 }
 
 export function andNot(yes, no) {
-  return utils.andNot(yes.nodes(), no.nodes());
+  return yes.getNodes().filter(item => !no.has(item));
 }

@@ -4,7 +4,7 @@ const allNodes = new WeakSet();
 
 function basicNode(name) {
   let self;
-  const nodeMap = new Map();
+  const nodeMap = new Map(), nodes = [];
   
   const set = (node, value) => {
     if(!allNodes.has(node)) {
@@ -12,29 +12,26 @@ function basicNode(name) {
     }
     if((value === undefined && !nodeMap.has(node)) || nodeMap.get(node) !== value) {
       nodeMap.set(node, value);
+      nodes.push(node);
       node.set(self, value);
       return true;
     }
     return false;
   };
   const remove = node => {
-    if(nodeMap.has(node)) {
+    if(utils.remove(nodes, node)) {
       nodeMap.delete(node);
       node.remove(self);
       return true;
     }
     return false;
   };
-  const has = node => nodeMap.has(node);
+  const has = node => nodes.indexOf(node) !== -1; // faster than nodeMap.has
   const get = node => nodeMap.get(node);
-  const nodes = () => {
-    const keys = [];
-    nodeMap.forEach(utils.pushB, keys);
-    return keys;
-  };
+  const getNodes = copy => copy ? utils.copy(nodes) : nodes;
   
   self = {
-    name, set, remove, has, get, nodes, safeNodes: nodes
+    name, set, remove, has, get, nodes, getNodes
   };
   allNodes.add(self);
   return self;
