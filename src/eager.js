@@ -12,15 +12,13 @@ function construct(minion, nodes, alerts) {
 export function all(...items) {
   const nodes = has.all(items);
   const adders = [], removers = [];
+  const minion = lazy.all(...items), mhas = minion.has;
   
   const adder = node => {
-    for(let i = 0, len = items.length; i < len; ++i) {
-      if(!items[i].has(node)) {
-        return;
-      }
+    if(mhas(node)) {
+      nodes.push(node);
+      utils.executeAll(adders, node);
     }
-    nodes.push(node);
-    utils.executeAll(adders, node);
   };
   const remover = node => {
     if(utils.remove(nodes, node)) {
@@ -33,12 +31,13 @@ export function all(...items) {
     items[i].on('remove', remover);
   }
   
-  return construct(lazy.all(...items), nodes, { 'add': adders, 'remove': removers });
+  return construct(minion, nodes, { 'add': adders, 'remove': removers });
 }
 
 export function any(...items) {
   const nodes = has.any(items);
   const adders = [], removers = [];
+  const minion = lazy.any(...items), mhas = minion.has;
   
   const adder = node => {
     if(nodes.indexOf(node) === -1) {
@@ -47,13 +46,10 @@ export function any(...items) {
     }
   };
   const remover = node => {
-    for(let i = 0, len = items.length; i < len; ++i) {
-      if(items[i].has(node)) {
-        return;
-      }
+    if(!mhas(node)) {
+      nodes.splice(nodes.indexOf(node), 1);
+      utils.executeAll(removers, node);
     }
-    nodes.splice(nodes.indexOf(node), 1);
-    utils.executeAll(removers, node);
   };
   
   for(let i = 0, len = items.length; i < len; ++i) {
@@ -61,7 +57,7 @@ export function any(...items) {
     items[i].on('remove', remover);
   }
   
-  return construct(lazy.any(...items), nodes, { 'add': adders, 'remove': removers });
+  return construct(minion, nodes, { 'add': adders, 'remove': removers });
 }
 
 export function andNot(yes, no) {
