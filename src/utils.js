@@ -29,10 +29,18 @@ export function excludes(array, item) {
   return indexOf(array, item) === -1;
 }
 
+export function removeIndex(array, index) {
+  const len = array.length - 1;
+  while(index < len) {
+    array[index] = array[++index];
+  }
+  array.length = len;
+}
+
 export function remove(array, item) {
   const index = indexOf(array, item);
   if(index !== -1) {
-    array.splice(index, 1);
+    removeIndex(array, index);
     return true;
   }
   return false;
