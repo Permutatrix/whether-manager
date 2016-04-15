@@ -34,7 +34,7 @@ export function removeIndex(array, index) {
   while(index < len) {
     array[index] = array[++index];
   }
-  array.length = len;
+  array.pop();
 }
 
 export function remove(array, item) {
