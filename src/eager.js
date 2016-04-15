@@ -40,14 +40,14 @@ export function any(...items) {
   const minion = lazy.any(...items), mhas = minion.has;
   
   const adder = node => {
-    if(nodes.indexOf(node) === -1) {
+    if(utils.excludes(nodes, node)) {
       nodes.push(node);
       utils.executeAll(adders, node);
     }
   };
   const remover = node => {
     if(!mhas(node)) {
-      nodes.splice(nodes.indexOf(node), 1);
+      utils.remove(nodes, node);
       utils.executeAll(removers, node);
     }
   };

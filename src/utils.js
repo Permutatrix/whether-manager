@@ -16,8 +16,21 @@ export function copy(array) {
   return out;
 }
 
+export function indexOf(array, item) {
+  for(let i = 0, len = array.length; i < len; ++i) {
+    if(array[i] === item) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+export function excludes(array, item) {
+  return indexOf(array, item) === -1;
+}
+
 export function remove(array, item) {
-  const index = array.indexOf(item);
+  const index = indexOf(array, item);
   if(index !== -1) {
     array.splice(index, 1);
     return true;
@@ -39,7 +52,7 @@ export function merge() {
 export function all(arrays) {
   return arrays[0].filter(item => {
     for(let i = 1, len = arrays.length; i < len; ++i) {
-      if(arrays[i].indexOf(item) === -1) {
+      if(excludes(arrays[i], item)) {
         return false;
       }
     }
@@ -56,7 +69,7 @@ export function any(arrays) {
     const arr = arrays[i];
     for(let j = 0, len = arr.length; j < len; ++j) {
       const item = arr[j];
-      if(out.indexOf(item) === -1) {
+      if(excludes(out, item)) {
         out.push(item);
       }
     }
@@ -65,7 +78,7 @@ export function any(arrays) {
 }
 
 export function andNot(yes, no) {
-  return yes.filter(item => no.indexOf(item) === -1);
+  return yes.filter(item => excludes(no, item));
 }
 
 export function onFunc(alerts) {
