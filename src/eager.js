@@ -1,88 +1,187 @@
 import * as utils from './utils.js';
+import secret from './secret.js';
 import * as has from './has.js';
 import * as lazy from './lazy.js';
 
-function construct(minion, nodes, alerts) {
-  minion.nodes = nodes;
-  minion.on = utils.onFunc(alerts);
-  minion.off = utils.offFunc(alerts);
-  return minion;
+function construct(nodes, alerts) {
+  return {
+    has: node => !utils.excludes(nodes, node),
+    nodes: nodes,
+    getNodes: copy => copy === undefined || copy ? utils.copy(nodes) : nodes,
+    on: utils.onFunc(alerts),
+    off: utils.offFunc(alerts)
+  };
 }
 
 export function all(...items) {
   const nodes = has.all(items);
   const adders = [], removers = [];
-  const minion = lazy.all(...items), mhas = minion.has;
+  const pAdders = [], pRemovers = [];
+  const adding = [], removing = [];
   
-  const adder = node => {
-    if(mhas(node)) {
+  const lazyHases = Array(items.length);
+  for(let i = 0, len = items.length; i < len; ++i) {
+    const item = secret.get(items[i]);
+    if(!item) {
+      throw Error("Attempted to include a non-family in an all()!");
+    }
+    lazyHases[i] = item.lazyHas;
+  }
+  const lazyHas = node => {
+    for(let i = 0, len = lazyHases.length; i < len; ++i) {
+      if(!lazyHases[i](node)) {
+        return false;
+      }
+    }
+    return true;
+  };
+  
+  const pAdder = node => {
+    if(lazyHas(node)) {
       nodes.push(node);
+      adding.push(node);
+      utils.executeAll(pAdders, node);
+    }
+  };
+  const pRemover = node => {
+    if(utils.remove(nodes, node)) {
+      removing.push(node);
+      utils.executeAll(pRemovers, node);
+    }
+  };
+  const adder = node => {
+    if(utils.remove(adding, node)) {
       utils.executeAll(adders, node);
     }
   };
   const remover = node => {
-    if(utils.remove(nodes, node)) {
+    if(utils.remove(removing, node)) {
       utils.executeAll(removers, node);
     }
   };
   
   for(let i = 0, len = items.length; i < len; ++i) {
+    const item = secret.get(items[i]);
+    item.adders.push(pAdder);
+    item.removers.push(pRemover);
     items[i].on('add', adder);
     items[i].on('remove', remover);
   }
   
-  return construct(minion, nodes, { 'add': adders, 'remove': removers });
+  const out = construct(nodes, { 'add': adders, 'remove': removers });
+  secret.set(out, { adders: pAdders, removers: pRemovers, lazyHas });
+  return out;
 }
 
 export function any(...items) {
   const nodes = has.any(items);
   const adders = [], removers = [];
-  const minion = lazy.any(...items), mhas = minion.has;
+  const pAdders = [], pRemovers = [];
+  const adding = [], removing = [];
   
-  const adder = node => {
+  const lazyHases = Array(items.length);
+  for(let i = 0, len = items.length; i < len; ++i) {
+    const item = secret.get(items[i]);
+    if(!item) {
+      throw Error("Attempted to include a non-family in an any()!");
+    }
+    lazyHases[i] = item.lazyHas;
+  }
+  const lazyHas = node => {
+    for(let i = 0, len = lazyHases.length; i < len; ++i) {
+      if(lazyHases[i](node)) {
+        return true;
+      }
+    }
+    return false;
+  };
+  
+  const pAdder = node => {
     if(utils.excludes(nodes, node)) {
       nodes.push(node);
+      adding.push(node);
+      utils.executeAll(pAdders, node);
+    }
+  };
+  const pRemover = node => {
+    if(!lazyHas(node)) {
+      utils.remove(nodes, node);
+      removing.push(node);
+      utils.executeAll(pRemovers, node);
+    }
+  };
+  const adder = node => {
+    if(utils.remove(adding, node)) {
       utils.executeAll(adders, node);
     }
   };
   const remover = node => {
-    if(!mhas(node)) {
-      utils.remove(nodes, node);
+    if(utils.remove(removing, node)) {
       utils.executeAll(removers, node);
     }
   };
   
   for(let i = 0, len = items.length; i < len; ++i) {
+    const item = secret.get(items[i]);
+    item.adders.push(pAdder);
+    item.removers.push(pRemover);
     items[i].on('add', adder);
     items[i].on('remove', remover);
   }
   
-  return construct(minion, nodes, { 'add': adders, 'remove': removers });
+  const out = construct(nodes, { 'add': adders, 'remove': removers });
+  secret.set(out, { adders: pAdders, removers: pRemovers, lazyHas });
+  return out;
 }
 
 export function andNot(yes, no) {
   const nodes = has.andNot(yes, no);
   const adders = [], removers = [];
+  const pAdders = [], pRemovers = [];
+  const adding = [], removing = [];
   
-  yes.on('add', node => {
-    if(!no.has(node)) {
+  const yesSecret = secret.get(yes);
+  const noSecret = secret.get(no);
+  if(!yesSecret || !noSecret) {
+    throw Error("Attempted to include a non-family in an andNot()!");
+  }
+  const lazyHas = node => (yesSecret.lazyHas(node) && !noSecret.lazyHas(node));
+  
+  const pAdder = node => {
+    if(lazyHas(node)) {
       nodes.push(node);
+      adding.push(node);
+      utils.executeAll(pAdders, node);
+    }
+  };
+  const pRemover = node => {
+    if(utils.remove(nodes, node)) {
+      removing.push(node);
+      utils.executeAll(pRemovers, node);
+    }
+  };
+  const adder = node => {
+    if(utils.remove(adding, node)) {
       utils.executeAll(adders, node);
     }
-  });
+  };
   const remover = node => {
-    if(utils.remove(nodes, node)) {
+    if(utils.remove(removing, node)) {
       utils.executeAll(removers, node);
     }
   };
-  yes.on('remove', remover);
-  no.on('add', remover);
-  no.on('remove', node => {
-    if(yes.has(node)) {
-      nodes.push(node);
-      utils.executeAll(adders, node);
-    }
-  });
   
-  return construct(lazy.andNot(yes, no), nodes, { 'add': adders, 'remove': removers });
+  yesSecret.adders.push(pAdder);
+  yesSecret.removers.push(pRemover);
+  yes.on('add', adder);
+  yes.on('remove', remover);
+  
+  noSecret.adders.push(pRemover);
+  noSecret.removers.push(pAdder);
+  no.on('add', remover);
+  no.on('remove', adder);
+  
+  const out = construct(nodes, { 'add': adders, 'remove': removers });
+  secret.set(out, { adders: pAdders, removers: pRemovers, lazyHas });
+  return out;
 }

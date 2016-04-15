@@ -1,4 +1,5 @@
 import * as utils from './utils.js';
+import secret from './secret.js';
 
 const allNodes = new WeakSet();
 
@@ -44,12 +45,20 @@ export function node(name) {
 export function supernode(name) {
   const node = basicNode(name);
   const adders = [], updaters = [], removers = [];
+  const pAdders = [], pRemovers = [];
   
   const nhas = node.has, nset = node.set, nremove = node.remove, nnodes = node.nodes;
+  
+  secret.set(node, { adders: pAdders, removers: pRemovers, lazyHas: nhas });
+  
   node.set = (node, value) => {
     const haveIt = nhas(node);
     if(nset(node, value)) {
-      const alerts = (haveIt ? updaters : adders);
+      let alerts = updaters;
+      if(!haveIt) {
+        alerts = adders;
+        utils.executeAll(pAdders, node);
+      }
       for(let i = 0, len = alerts.length; i < len; ++i) {
         alerts[i](node, value);
       }
@@ -59,6 +68,7 @@ export function supernode(name) {
   };
   const remove = node.remove = node => {
     if(nremove(node)) {
+      utils.executeAll(pRemovers, node);
       utils.executeAll(removers, node);
       return true;
     }
