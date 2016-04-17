@@ -108,30 +108,16 @@ export function onFunc(alerts) {
 
 export function offFunc(alerts) {
   return function() {
-    let len = arguments.length - 1;
-    if(len === -1) { // no arguments passed
-      // remove all alerts from all types
+    const len = arguments.length - 1, alert = arguments[len];
+    if(len !== 0) {
+      for(let i = 0; i < len; ++i) {
+        remove(alerts[arguments[i]], alert);
+      }
+    } else { // no types passed
+      // remove this alert from all types
       const types = Object.keys(alerts);
       for(let i = 0, len = types.length; i < len; ++i) {
-        alerts[types[i]].length = 0;
-      }
-    } else {
-      let alert = arguments[len], types = arguments;
-      if(typeof alert !== 'function') { // no function passed
-        // remove all alerts for this type(s)
-        alert = undefined;
-        ++len;
-      } else if(len === 0) { // no alert types passed
-        // remove this alert from all types
-        types = Object.keys(alerts);
-        len = types.length;
-      }
-      for(let i = 0; i < len; ++i) {
-        if(alert) {
-          remove(alerts[types[i]], alert);
-        } else {
-          alerts[types[i]].length = 0;
-        }
+        remove(alerts[types[i]], alert);
       }
     }
   };
