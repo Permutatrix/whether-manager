@@ -4,13 +4,13 @@ import * as has from './has.js';
 import * as lazy from './lazy.js';
 
 function construct(nodes, alerts) {
-  return {
+  return Object.freeze({
     has: node => !utils.excludes(nodes, node),
     nodes: nodes,
     getNodes: copy => copy === undefined || copy ? utils.copy(nodes) : nodes,
     on: utils.onFunc(alerts),
     off: utils.offFunc(alerts)
-  };
+  });
 }
 
 export function all(...items) {
