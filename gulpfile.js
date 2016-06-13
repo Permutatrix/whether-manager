@@ -6,7 +6,7 @@ var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 
 
-gulp.task('default', function(cb) {
+gulp.task('default', function() {
   return rollup({ entry: './src/whether-manager.js' })
   .pipe(source('whether-manager.js', './src'))
   .pipe(buffer())
