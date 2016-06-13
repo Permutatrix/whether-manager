@@ -3,14 +3,16 @@ import secret from './secret.js';
 import * as has from './has.js';
 import * as lazy from './lazy.js';
 
-function construct(nodes, alerts) {
-  return Object.freeze({
+function construct(nodes, alerts, pimpl) {
+  const out = Object.freeze({
     has: node => !utils.excludes(nodes, node),
     nodes: nodes,
     getNodes: copy => copy === undefined || copy ? utils.copy(nodes) : nodes,
     on: utils.onFunc(alerts),
     off: utils.offFunc(alerts)
   });
+  secret.set(out, pimpl);
+  return out;
 }
 
 export function all(...items) {
@@ -68,9 +70,11 @@ export function all(...items) {
     items[i].on('remove', remover);
   }
   
-  const out = construct(nodes, { 'add': adders, 'remove': removers });
-  secret.set(out, { adders: pAdders, removers: pRemovers, lazyHas });
-  return out;
+  return construct(
+    nodes,
+    { 'add': adders, 'remove': removers },
+    { adders: pAdders, removers: pRemovers, lazyHas }
+  );
 }
 
 export function any(...items) {
@@ -129,9 +133,11 @@ export function any(...items) {
     items[i].on('remove', remover);
   }
   
-  const out = construct(nodes, { 'add': adders, 'remove': removers });
-  secret.set(out, { adders: pAdders, removers: pRemovers, lazyHas });
-  return out;
+  return construct(
+    nodes,
+    { 'add': adders, 'remove': removers },
+    { adders: pAdders, removers: pRemovers, lazyHas }
+  );
 }
 
 export function andNot(yes, no) {
@@ -181,7 +187,9 @@ export function andNot(yes, no) {
   no.on('add', remover);
   no.on('remove', adder);
   
-  const out = construct(nodes, { 'add': adders, 'remove': removers });
-  secret.set(out, { adders: pAdders, removers: pRemovers, lazyHas });
-  return out;
+  return construct(
+    nodes,
+    { 'add': adders, 'remove': removers },
+    { adders: pAdders, removers: pRemovers, lazyHas }
+  );
 }
