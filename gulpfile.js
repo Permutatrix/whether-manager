@@ -10,6 +10,6 @@ gulp.task('default', function() {
   return rollup({ entry: './src/whether-manager.js' })
   .pipe(source('whether-manager.js', './src'))
   .pipe(buffer())
-  .pipe(babel({ presets: ['es2015'] }))
+  .pipe(babel({ presets: ['es2015-minimal'] }))
   .pipe(gulp.dest('.'));
 });
