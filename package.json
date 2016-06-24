@@ -1,6 +1,6 @@
 {
   "name": "whether-manager",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "like an ECS, but cooler by about a fifth",
   "main": "whether-manager.js",
   "jsnext:main": "src/whether-manager.js",
