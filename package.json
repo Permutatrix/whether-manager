@@ -8,7 +8,7 @@
     "node": ">=0.12"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -29,6 +29,8 @@
     "babel-preset-es2015-minimal": "^2.0.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
+    "mocha": "^2.5.3",
+    "must": "^0.13.1",
     "rollup-stream": "^1.8.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
