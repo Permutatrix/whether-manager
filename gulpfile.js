@@ -25,6 +25,7 @@ gulp.task('test', ['default'], function(cb) {
     if(errorCount > 0) {
       process.exit(1);
     }
+    cb();
   });
 });
 
