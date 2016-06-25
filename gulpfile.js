@@ -45,5 +45,9 @@ gulp.task('test', ['instrumented'], function(cb) {
     }
   });
   mocha.addFile(path.resolve(process.cwd(), 'test/test.js'));
-  mocha.run();
+  mocha.run(function(errorCount) {
+    if(errorCount > 0) {
+      process.exit(1);
+    }
+  });
 });
