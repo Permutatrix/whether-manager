@@ -18,6 +18,16 @@ gulp.task('default', function() {
   .pipe(gulp.dest('.'));
 });
 
+gulp.task('test', ['default'], function(cb) {
+  var mocha = new Mocha();
+  mocha.addFile(path.resolve(process.cwd(), 'test/test.js'));
+  mocha.run(function(errorCount) {
+    if(errorCount > 0) {
+      process.exit(1);
+    }
+  });
+});
+
 gulp.task('instrumented', function() {
   return rollup({
     entry: './src/whether-manager.js',
@@ -29,7 +39,7 @@ gulp.task('instrumented', function() {
   .pipe(gulp.dest('.'));
 });
 
-gulp.task('test', ['instrumented'], function(cb) {
+gulp.task('coverage', ['instrumented'], function(cb) {
   var mocha = new Mocha({
     reporter: function(runner) {
       var collector = new istanbul.Collector();

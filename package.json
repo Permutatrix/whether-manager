@@ -9,8 +9,7 @@
   },
   "scripts": {
     "test": "gulp test",
-    "coverage": "codecov",
-    "prepublish": "gulp"
+    "coverage": "gulp coverage"
   },
   "repository": {
     "type": "git",
