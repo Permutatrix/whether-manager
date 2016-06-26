@@ -47,7 +47,7 @@ export function supernode(name) {
   const adders = [], updaters = [], removers = [];
   const pAdders = [], pRemovers = [];
   
-  const nhas = node.has, nset = node.set, nremove = node.remove, nnodes = node.nodes;
+  const nhas = node.has, nset = node.set, nremove = node.remove;
   
   secret.set(node, { adders: pAdders, removers: pRemovers, lazyHas: nhas });
   
