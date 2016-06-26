@@ -11,9 +11,12 @@ function basicNode(name) {
     if(!allNodes.has(node)) {
       throw Error("Attempted to link a node to a non-node!");
     }
-    if((value === undefined && !nodeMap.has(node)) || nodeMap.get(node) !== value) {
+    var excludes = utils.excludes(nodes, node);
+    if(excludes || nodeMap.get(node) !== value) {
+      if(excludes) {
+        nodes.push(node);
+      }
       nodeMap.set(node, value);
-      nodes.push(node);
       node.set(self, value);
       return true;
     }
