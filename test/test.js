@@ -25,6 +25,16 @@ function describeNodes(node) {
     demand(b.has(a)).be.false();
   });
   
+  it("should be allowed to link to itself", function() {
+    var a = node();
+    demand(a.set(a)).be.true();
+    demand(a.has(a)).be.true();
+    demand(a.set(a, 'x')).be.true();
+    demand(a.get(a)).equal('x');
+    demand(a.remove(a)).be.true();
+    demand(a.has(a)).be.false();
+  });
+  
   describe(".set()", function() {
     
     it("should throw when called with a non-node", function() {
@@ -191,5 +201,86 @@ describe("Nodes", function() {
 describe("Supernodes", function() {
   
   describeNodes(wm.supernode);
+  
+  describe(".on()", function() {
+    
+    it("should allow listening for 'add'", function() {
+      var x = wm.supernode(), called;
+      x.on('add', function() {
+        called = true;
+      });
+      x.set(x);
+      demand(called).be.true();
+    });
+    
+    it("should allow listening for 'update'", function() {
+      var x = wm.supernode(), called;
+      x.on('update', function() {
+        called = true;
+      });
+      x.set(x);
+      x.set(x, 'x');
+      demand(called).be.true();
+    });
+    
+    it("should allow listening for 'remove'", function() {
+      var x = wm.supernode(), called;
+      x.on('remove', function() {
+        called = true;
+      });
+      x.set(x);
+      x.remove(x);
+      demand(called).be.true();
+    });
+    
+    it("should not notify 'update' when a node is first linked", function() {
+      var x = wm.supernode(), called;
+      x.on('update', function() {
+        called = true;
+      });
+      x.set(x, 'x');
+      demand(called).be.undefined();
+    });
+    
+    it("should not notify 'add' when a node is updated", function() {
+      var x = wm.supernode(), called;
+      x.set(x);
+      x.on('add', function() {
+        called = true;
+      });
+      x.set(x, 'x');
+      demand(called).be.undefined();
+    });
+    
+    it("should not notify 'add' and not 'update' when a node is re-added", function() {
+      var x = wm.supernode(), added, updated;
+      x.set(x);
+      x.remove(x);
+      x.on('add', function() {
+        added = true;
+      });
+      x.on('update', function() {
+        added = true;
+      });
+      x.set(x, 'x');
+      demand(added).be.true();
+      demand(updated).be.undefined();
+    });
+    
+    it("should accept multiple alert types", function() {
+      var x = wm.supernode('x'), a = wm.node('a'), calls = 0;
+      x.on('add', 'remove', function() {
+        ++calls;
+      });
+      demand(calls).equal(0);
+      x.set(a);
+      demand(calls).equal(1);
+      x.set(a, 'x');
+      demand(calls).equal(1);
+      x.remove(a);
+      demand(calls).equal(2);
+    });
+    
+  });
   
 });
