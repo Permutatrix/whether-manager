@@ -35,5 +35,12 @@
     "rollup-stream": "^1.8.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
-  }
+  },
+  "files": [
+    "src",
+    "whether-manager.js",
+    "LICENSE",
+    "README.md",
+    "package.json"
+  ]
 }
