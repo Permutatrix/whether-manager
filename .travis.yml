@@ -4,6 +4,16 @@ node_js:
   - '4'
   - '5'
   - '6'
-script: npm run coverage
+matrix: # for versions that gulp won't run on
+  include:
+    - node_js: '0.8'
+      env: BUILD_WITH_0_12=1
+    - node_js: '0.10'
+      env: BUILD_WITH_0_12=1
+script:
+  - if [ $BUILD_WITH_0_12 -eq 1 ]; then nvm install 0.12 ; fi
+  - gulp instrumented
+  - nvm use $TRAVIS_NODE_VERSION
+  - node ./scripts/run-coverage.js
 after_success:
   - codecov
