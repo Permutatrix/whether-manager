@@ -247,7 +247,7 @@ describe("Supernodes", function() {
       demand(called).be.undefined();
     });
     
-    it("should not notify 'add' and not 'update' when a node is re-added", function() {
+    it("should notify 'add' and not 'update' when a node is re-added", function() {
       var x = wm.supernode(), added, updated;
       x.set(x);
       x.remove(x);
