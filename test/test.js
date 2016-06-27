@@ -137,6 +137,8 @@ function describeNode(node) {
       demand(a.get(b)).equal('x');
       a.set(b, 'y');
       demand(a.get(b)).equal('y');
+      a.remove(b);
+      demand(a.get(b, b)).equal(b);
     });
     
   });
