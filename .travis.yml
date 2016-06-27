@@ -10,8 +10,10 @@ matrix: # for versions that gulp won't run on
       env: BUILD_WITH_0_12=1
     - node_js: '0.10'
       env: BUILD_WITH_0_12=1
-script:
+install:
   - if [ $BUILD_WITH_0_12 -eq 1 ]; then nvm install 0.12 ; fi
+  - npm install
+script:
   - gulp instrumented
   - nvm use $TRAVIS_NODE_VERSION
   - node ./scripts/run-coverage.js
