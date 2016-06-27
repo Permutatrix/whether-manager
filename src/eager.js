@@ -46,18 +46,18 @@ export function all(...items) {
     }
   };
   const pRemover = node => {
-    if(utils.remove(nodes, node)) {
+    if(utils.remove(nodes, node) !== -1) {
       removing.push(node);
       utils.executeAll(pRemovers, node);
     }
   };
   const adder = node => {
-    if(utils.remove(adding, node)) {
+    if(utils.remove(adding, node) !== -1) {
       utils.executeAll(adders, node);
     }
   };
   const remover = node => {
-    if(utils.remove(removing, node)) {
+    if(utils.remove(removing, node) !== -1) {
       utils.executeAll(removers, node);
     }
   };
@@ -115,12 +115,12 @@ export function any(...items) {
     }
   };
   const adder = node => {
-    if(utils.remove(adding, node)) {
+    if(utils.remove(adding, node) !== -1) {
       utils.executeAll(adders, node);
     }
   };
   const remover = node => {
-    if(utils.remove(removing, node)) {
+    if(utils.remove(removing, node) !== -1) {
       utils.executeAll(removers, node);
     }
   };
@@ -161,18 +161,18 @@ export function andNot(yes, no) {
     }
   };
   const pRemover = node => {
-    if(utils.remove(nodes, node)) {
+    if(utils.remove(nodes, node) !== -1) {
       removing.push(node);
       utils.executeAll(pRemovers, node);
     }
   };
   const adder = node => {
-    if(utils.remove(adding, node)) {
+    if(utils.remove(adding, node) !== -1) {
       utils.executeAll(adders, node);
     }
   };
   const remover = node => {
-    if(utils.remove(removing, node)) {
+    if(utils.remove(removing, node) !== -1) {
       utils.executeAll(removers, node);
     }
   };

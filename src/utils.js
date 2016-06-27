@@ -41,9 +41,8 @@ export function remove(array, item) {
   const index = indexOf(array, item);
   if(index !== -1) {
     removeIndex(array, index);
-    return true;
   }
-  return false;
+  return index;
 }
 
 export function merge() {

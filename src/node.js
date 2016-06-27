@@ -1,43 +1,61 @@
 import * as utils from './utils.js';
 import secret from './secret.js';
 
-const allNodes = new WeakSet();
+const lock = {};
 
 function basicNode(name) {
   let self;
-  const nodeMap = new Map(), nodes = [];
+  // this is faster than a Map as long as you keep your link count down.
+  // it's also absolutely appalling... but let's not worry about that.
+  const nodes = [], values = [];
   
   const set = (node, value) => {
-    if(!allNodes.has(node)) {
-      throw Error("Attempted to link a node to a non-node!");
-    }
-    var excludes = utils.excludes(nodes, node);
-    if(excludes || nodeMap.get(node) !== value) {
-      if(excludes) {
+    const index = utils.indexOf(nodes, node);
+    if(index === -1 || values[index] !== value) {
+      if(index === -1) {
         nodes.push(node);
+        values.push(value);
+      } else {
+        values[index] = value;
       }
-      nodeMap.set(node, value);
       node.set(self, value);
       return true;
     }
     return false;
   };
   const remove = node => {
-    if(utils.remove(nodes, node)) {
-      nodeMap.delete(node);
+    const index = utils.remove(nodes, node);
+    if(index !== -1) {
+      utils.removeIndex(values, index);
       node.remove(self);
       return true;
     }
     return false;
   };
-  const has = node => !utils.excludes(nodes, node); // faster than nodeMap.has
-  const get = node => nodeMap.get(node);
+  const has = node => {
+    return node.nodes.length < nodes.length ?
+             !utils.excludes(node.nodes, self) :
+             !utils.excludes(nodes, node);
+  };
+  const get = (node, unvalue) => {
+    if(node.nodes.length < nodes.length) {
+      const index = utils.indexOf(node.nodes, self);
+      if(index !== -1) {
+        return node.values[index];
+      }
+    } else {
+      const index = utils.indexOf(nodes, node);
+      if(index !== -1) {
+        return values[index];
+      }
+    }
+    return unvalue;
+  };
   const getNodes = copy => copy === undefined || copy ? utils.copy(nodes) : nodes;
   
   self = {
-    name, set, remove, has, get, nodes, getNodes
+    name, set, remove, has, get, getNodes, nodes, values
   };
-  allNodes.add(self);
   return self;
 }
 
@@ -46,19 +64,19 @@ export function node(name) {
 }
 
 export function supernode(name) {
-  const node = basicNode(name);
+  const self = basicNode(name);
   const adders = [], updaters = [], removers = [];
   const pAdders = [], pRemovers = [];
   
-  const nhas = node.has, nset = node.set, nremove = node.remove;
+  const nhas = self.has, nset = self.set, nremove = self.remove, nnodes = self.nodes;
   
-  secret.set(node, { adders: pAdders, removers: pRemovers, lazyHas: nhas });
+  secret.set(self, { adders: pAdders, removers: pRemovers, lazyHas: nhas });
   
-  node.set = (node, value) => {
-    const haveIt = nhas(node);
+  self.set = (node, value) => {
+    const length = nnodes.length;
     if(nset(node, value)) {
       let alerts = updaters;
-      if(!haveIt) {
+      if(nnodes.length > length) {
         alerts = adders;
         utils.executeAll(pAdders, node);
       }
@@ -69,7 +87,7 @@ export function supernode(name) {
     }
     return false;
   };
-  const remove = node.remove = node => {
+  self.remove = node => {
     if(nremove(node)) {
       utils.executeAll(pRemovers, node);
       utils.executeAll(removers, node);
@@ -79,8 +97,8 @@ export function supernode(name) {
   };
   
   const alerts = { 'add': adders, 'update': updaters, 'remove': removers };
-  node.on = utils.onFunc(alerts);
-  node.off = utils.offFunc(alerts);
+  self.on = utils.onFunc(alerts);
+  self.off = utils.offFunc(alerts);
   
-  return Object.freeze(node);
+  return Object.freeze(self);
 }

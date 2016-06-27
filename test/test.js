@@ -37,11 +37,6 @@ function describeNodes(node) {
   
   describe(".set()", function() {
     
-    it("should throw when called with a non-node", function() {
-      var a = node();
-      demand(function() { a.set({}); }).to.throw(/non-node/i);
-    });
-    
     it("should return true if there's a change", function() {
       var a = node(), b = node();
       demand(a.set(b)).be.true();
