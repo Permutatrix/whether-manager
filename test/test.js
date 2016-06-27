@@ -1,7 +1,7 @@
 var demand = require('must');
 var wm = require('..');
 
-function describeNodes(node) {
+function describeNode(node) {
   
   it("should be frozen", function() {
     var a = node();
@@ -90,6 +90,16 @@ function describeNodes(node) {
       demand(a.has(b)).be.false();
     });
     
+    it("should work when the callee has more nodes than the argument", function() {
+      var a = node(), b = node();
+      a.set(a);
+      demand(a.has(b)).be.false();
+      a.set(b);
+      demand(a.has(b)).be.true();
+      a.remove(b);
+      demand(a.has(b)).be.false();
+    });
+    
   });
   
   describe(".get()", function() {
@@ -100,18 +110,33 @@ function describeNodes(node) {
       demand(a.get(b)).equal('x');
     });
     
-    it("should return undefined if the nodes aren't linked", function() {
+    it("should return the second argument if the nodes aren't linked", function() {
       var a = node(), b = node();
-      demand(a.get(b)).be.undefined();
+      var o = {};
+      demand(a.get(b, o)).equal(o);
       a.set(b, 'x');
       a.remove(b);
-      demand(a.get(b)).be.undefined();
+      demand(a.get(b, b)).equal(b);
     });
     
     it("should return undefined if the nodes' link value is undefined", function() {
       var a = node(), b = node();
       a.set(b);
+      demand(a.get(b, 'x')).be.undefined();
+    });
+    
+    it("should use undefined as the default if no second argument is passed", function() {
+      var a = node(), b = node();
       demand(a.get(b)).be.undefined();
+    });
+    
+    it("should work when the callee has more nodes than the argument", function() {
+      var a = node(), b = node();
+      a.set(a);
+      a.set(b, 'x');
+      demand(a.get(b)).equal('x');
+      a.set(b, 'y');
+      demand(a.get(b)).equal('y');
     });
     
   });
@@ -187,15 +212,15 @@ function describeNodes(node) {
   
 }
 
-describe("Nodes", function() {
+describe("Node", function() {
   
-  describeNodes(wm.node);
+  describeNode(wm.node);
   
 });
 
-describe("Supernodes", function() {
+describe("Supernode", function() {
   
-  describeNodes(wm.supernode);
+  describeNode(wm.supernode);
   
   describe(".on()", function() {
     
