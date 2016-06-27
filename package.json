@@ -4,9 +4,6 @@
   "description": "like an ECS, but cooler by about a fifth",
   "main": "whether-manager.js",
   "jsnext:main": "src/whether-manager.js",
-  "engines": {
-    "node": ">=0.12"
-  },
   "scripts": {
     "test": "gulp test",
     "coverage": "gulp coverage"
