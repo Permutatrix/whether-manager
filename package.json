@@ -4,6 +4,7 @@
   "description": "like an ECS, but cooler by about a fifth",
   "main": "whether-manager.js",
   "jsnext:main": "src/whether-manager.js",
+  "typings": "whether-manager.d.ts",
   "typescript": {
     "definition": "whether-manager.d.ts"
   },
