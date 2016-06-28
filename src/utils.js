@@ -93,7 +93,9 @@ export function onFunc(alerts) {
     const len = arguments.length - 1, alert = arguments[len];
     if(len !== 0) {
       for(let i = 0; i < len; ++i) {
-        alerts[arguments[i]].push(alert);
+        if(alerts[arguments[i]]) {
+          alerts[arguments[i]].push(alert);
+        } // fail silently otherwise
       }
     } else { // no types passed
       // add this alert to all types
@@ -110,7 +112,9 @@ export function offFunc(alerts) {
     const len = arguments.length - 1, alert = arguments[len];
     if(len !== 0) {
       for(let i = 0; i < len; ++i) {
-        remove(alerts[arguments[i]], alert);
+        if(alerts[arguments[i]]) {
+          remove(alerts[arguments[i]], alert);
+        } // fail silently otherwise
       }
     } else { // no types passed
       // remove this alert from all types

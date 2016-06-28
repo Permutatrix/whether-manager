@@ -18,16 +18,16 @@ declare module 'whether-manager' {
   
   export interface Family extends Group {
     nodes: Node<{}>[];
-    on(type: 'add' | 'remove', callback: (node: Node<{}>) => any): void;
+    on(type: string, callback: (node: Node<{}>) => any): void;
     on(callback: (node: Node<{}>) => any): void;
-    off(type: 'add' | 'remove', callback: (node: Node<{}>) => any): void;
+    off(type: string, callback: (node: Node<{}>) => any): void;
     off(callback: (node: Node<{}>) => any): void;
   }
   
   export interface Supernode<A> extends Node<A>, Family {
-    on(type: 'add' | 'update' | 'remove', callback: (node: Node<{}>, value: A) => any): void;
+    on(type: string, callback: (node: Node<{}>, value: A) => any): void;
     on(callback: (node: Node<{}>, value: A) => any): void;
-    off(type: 'add' | 'update' | 'remove', callback: (node: Node<{}>, value: A) => any): void;
+    off(type: string, callback: (node: Node<{}>, value: A) => any): void;
     off(callback: (node: Node<{}>, value: A) => any): void;
   }
   
