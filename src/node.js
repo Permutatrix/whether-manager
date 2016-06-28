@@ -68,7 +68,7 @@ export function supernode(name) {
   const adders = [], updaters = [], removers = [];
   const pAdders = [], pRemovers = [];
   
-  const nhas = self.has, nset = self.set, nremove = self.remove, nnodes = self.nodes;
+  const nhas = self.has, nset = self.set, nremove = self.remove, nnodes = self.nodes, nvalues = self.values;
   
   secret.set(self, { adders: pAdders, removers: pRemovers, lazyHas: nhas });
   
@@ -88,9 +88,15 @@ export function supernode(name) {
     return false;
   };
   self.remove = node => {
-    if(nremove(node)) {
+    const index = utils.remove(nnodes, node);
+    if(index !== -1) {
+      const value = nvalues[index];
+      utils.removeIndex(nvalues, index);
       utils.executeAll(pRemovers, node);
-      utils.executeAll(removers, node);
+      node.remove(self);
+      for(let i = 0, len = removers.length; i < len; ++i) {
+        removers[i](node, value);
+      }
       return true;
     }
     return false;
