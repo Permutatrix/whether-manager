@@ -16,6 +16,10 @@ function construct(nodes, alerts, pimpl) {
 }
 
 export function all(...items) {
+  if(Array.isArray(items[0])) {
+    return all.apply(this, items[0]);
+  }
+  
   const nodes = has.all(items);
   const adders = [], removers = [];
   const pAdders = [], pRemovers = [];
@@ -78,6 +82,10 @@ export function all(...items) {
 }
 
 export function any(...items) {
+  if(Array.isArray(items[0])) {
+    return any.apply(this, items[0]);
+  }
+  
   const nodes = has.any(items);
   const adders = [], removers = [];
   const pAdders = [], pRemovers = [];

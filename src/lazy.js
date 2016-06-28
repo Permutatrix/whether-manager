@@ -3,6 +3,9 @@
 import * as has from './has.js';
 
 export function all(...items) {
+  if(Array.isArray(items[0])) {
+    return all.apply(this, items[0]);
+  }
   return Object.freeze({
     has: node => {
       for(let i = 0, len = items.length; i < len; ++i) {
@@ -17,6 +20,9 @@ export function all(...items) {
 }
 
 export function any(...items) {
+  if(Array.isArray(items[0])) {
+    return any.apply(this, items[0]);
+  }
   return Object.freeze({
     has: node => {
       for(let i = 0, len = items.length; i < len; ++i) {
