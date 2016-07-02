@@ -349,6 +349,59 @@ describe("Supernode", function() {
       demand(calls).equal(2);
     });
     
+    it("should notify 'add' symmetrically", function() {
+      var x = wm.supernode(), y = wm.supernode(), callsX = 0, callsY = 0;
+      x.on('add', function(node, value) {
+        ++callsX;
+        demand(node).equal(y);
+        demand(value).equal('x');
+      });
+      y.on('add', function(node, value) {
+        ++callsY;
+        demand(node).equal(x);
+        demand(value).equal('x');
+      });
+      x.set(y, 'x');
+      demand(callsX).equal(1);
+      demand(callsY).equal(1);
+    });
+    
+    it("should notify 'update' symmetrically", function() {
+      var x = wm.supernode(), y = wm.supernode(), callsX = 0, callsY = 0;
+      x.on('update', function(node, value) {
+        ++callsX;
+        demand(node).equal(y);
+        demand(value).equal('x');
+      });
+      y.on('update', function(node, value) {
+        ++callsY;
+        demand(node).equal(x);
+        demand(value).equal('x');
+      });
+      x.set(y);
+      x.set(y, 'x');
+      demand(callsX).equal(1);
+      demand(callsY).equal(1);
+    });
+    
+    it("should notify 'remove' symmetrically", function() {
+      var x = wm.supernode(), y = wm.supernode(), callsX = 0, callsY = 0;
+      x.on('remove', function(node, value) {
+        ++callsX;
+        demand(node).equal(y);
+        demand(value).equal('x');
+      });
+      y.on('remove', function(node, value) {
+        ++callsY;
+        demand(node).equal(x);
+        demand(value).equal('x');
+      });
+      x.set(y, 'x');
+      x.remove(y);
+      demand(callsX).equal(1);
+      demand(callsY).equal(1);
+    });
+    
     it("shouldn't notify 'add' until the node has been added", function() {
       var x = wm.supernode('x'), a = wm.node('a'), calls = 0;
       x.on('add', function() {
@@ -389,7 +442,6 @@ describe("Supernode", function() {
       demand(calls).equal(4);
     });
     
-    // listeners should be called symmetrically
     // listeners should only be called when a change actually occurs
     
   });
