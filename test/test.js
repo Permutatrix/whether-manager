@@ -35,6 +35,40 @@ function describeNode(node) {
     demand(a.has(a)).be.false();
   });
   
+  describe(".name", function() {
+    
+    it("should be equal to the passed-in name", function() {
+      var a = node('a'), b = node('b');
+      demand(a.name).equal('a');
+      demand(b.name).equal('b');
+    });
+    
+    it("should be undefined if no name is given", function() {
+      var a = node();
+      demand(a.name).be.undefined();
+    });
+    
+  });
+  
+  describe(".nodes", function() {
+    
+    it("should be an array of linked nodes", function() {
+      var a = node(), b = node(), c = node();
+      demand(a.nodes).be.empty();
+      a.set(b);
+      demand(a.nodes).eql([b]);
+      a.set(c);
+      demand(a.nodes).have.length(2);
+      demand(a.nodes).include(b);
+      demand(a.nodes).include(c);
+      a.remove(b);
+      demand(a.nodes).eql([c]);
+      a.remove(c);
+      demand(a.nodes).be.empty();
+    });
+    
+  });
+  
   describe(".set()", function() {
     
     it("should return true if there's a change", function() {
@@ -175,40 +209,6 @@ function describeNode(node) {
     });
     
     // there's no test for the inverse because that behavior is undefined.
-    
-  });
-  
-  describe(".name", function() {
-    
-    it("should be equal to the passed-in name", function() {
-      var a = node('a'), b = node('b');
-      demand(a.name).equal('a');
-      demand(b.name).equal('b');
-    });
-    
-    it("should be undefined if no name is given", function() {
-      var a = node();
-      demand(a.name).be.undefined();
-    });
-    
-  });
-  
-  describe(".nodes", function() {
-    
-    it("should be an array of linked nodes", function() {
-      var a = node(), b = node(), c = node();
-      demand(a.nodes).be.empty();
-      a.set(b);
-      demand(a.nodes).eql([b]);
-      a.set(c);
-      demand(a.nodes).have.length(2);
-      demand(a.nodes).include(b);
-      demand(a.nodes).include(c);
-      a.remove(b);
-      demand(a.nodes).eql([c]);
-      a.remove(c);
-      demand(a.nodes).be.empty();
-    });
     
   });
   
