@@ -15,19 +15,19 @@ function construct(nodes, alerts, pimpl) {
   return Object.freeze(out);
 }
 
-export function all(...items) {
-  if(Array.isArray(items[0])) {
-    items = items[0];
+export function all(...families) {
+  if(Array.isArray(families[0])) {
+    families = families[0];
   }
   
-  const nodes = has.all(items);
+  const nodes = has.all(families);
   const adders = [], removers = [];
   const pAdders = [], pRemovers = [];
   const adding = [], removing = [];
   
-  const lazyHases = Array(items.length);
-  for(let i = 0, len = items.length; i < len; ++i) {
-    const item = secret.get(items[i]);
+  const lazyHases = Array(families.length);
+  for(let i = 0, len = families.length; i < len; ++i) {
+    const item = secret.get(families[i]);
     if(!item) {
       throw Error("Attempted to include a non-family in an all()!");
     }
@@ -66,12 +66,12 @@ export function all(...items) {
     }
   };
   
-  for(let i = 0, len = items.length; i < len; ++i) {
-    const item = secret.get(items[i]);
+  for(let i = 0, len = families.length; i < len; ++i) {
+    const item = secret.get(families[i]);
     item.adders.push(pAdder);
     item.removers.push(pRemover);
-    items[i].on('add', adder);
-    items[i].on('remove', remover);
+    families[i].on('add', adder);
+    families[i].on('remove', remover);
   }
   
   return construct(
@@ -81,19 +81,19 @@ export function all(...items) {
   );
 }
 
-export function any(...items) {
-  if(Array.isArray(items[0])) {
-    items = items[0];
+export function any(...families) {
+  if(Array.isArray(families[0])) {
+    families = families[0];
   }
   
-  const nodes = has.any(items);
+  const nodes = has.any(families);
   const adders = [], removers = [];
   const pAdders = [], pRemovers = [];
   const adding = [], removing = [];
   
-  const lazyHases = Array(items.length);
-  for(let i = 0, len = items.length; i < len; ++i) {
-    const item = secret.get(items[i]);
+  const lazyHases = Array(families.length);
+  for(let i = 0, len = families.length; i < len; ++i) {
+    const item = secret.get(families[i]);
     if(!item) {
       throw Error("Attempted to include a non-family in an any()!");
     }
@@ -133,12 +133,12 @@ export function any(...items) {
     }
   };
   
-  for(let i = 0, len = items.length; i < len; ++i) {
-    const item = secret.get(items[i]);
+  for(let i = 0, len = families.length; i < len; ++i) {
+    const item = secret.get(families[i]);
     item.adders.push(pAdder);
     item.removers.push(pRemover);
-    items[i].on('add', adder);
-    items[i].on('remove', remover);
+    families[i].on('add', adder);
+    families[i].on('remove', remover);
   }
   
   return construct(
