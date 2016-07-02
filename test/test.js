@@ -227,66 +227,66 @@ describe("Supernode", function() {
   describe(".on()", function() {
     
     it("should allow listening for 'add'", function() {
-      var x = wm.supernode(), called;
+      var x = wm.supernode(), calls = 0;
       x.on('add', function() {
-        called = true;
+        ++calls;
       });
       x.set(x);
-      demand(called).be.true();
+      demand(calls).equal(1);
     });
     
     it("should allow listening for 'update'", function() {
-      var x = wm.supernode(), called;
+      var x = wm.supernode(), calls = 0;
       x.on('update', function() {
-        called = true;
+        ++calls;
       });
       x.set(x);
       x.set(x, 'x');
-      demand(called).be.true();
+      demand(calls).equal(1);
     });
     
     it("should allow listening for 'remove'", function() {
-      var x = wm.supernode(), called;
+      var x = wm.supernode(), calls = 0;
       x.on('remove', function() {
-        called = true;
+        ++calls;
       });
       x.set(x);
       x.remove(x);
-      demand(called).be.true();
+      demand(calls).equal(1);
     });
     
     it("should not notify 'update' when a node is first linked", function() {
-      var x = wm.supernode(), called;
+      var x = wm.supernode(), calls = 0;
       x.on('update', function() {
-        called = true;
+        ++calls;
       });
       x.set(x, 'x');
-      demand(called).be.undefined();
+      demand(calls).equal(0);
     });
     
     it("should not notify 'add' when a node is updated", function() {
-      var x = wm.supernode(), called;
+      var x = wm.supernode(), calls = 0;
       x.set(x);
       x.on('add', function() {
-        called = true;
+        ++calls;
       });
       x.set(x, 'x');
-      demand(called).be.undefined();
+      demand(calls).equal(0);
     });
     
     it("should notify 'add' and not 'update' when a node is re-added", function() {
-      var x = wm.supernode(), added, updated;
+      var x = wm.supernode(), adds = 0, updates = 0;
       x.set(x);
       x.remove(x);
       x.on('add', function() {
-        added = true;
+        ++adds;
       });
       x.on('update', function() {
-        added = true;
+        ++updates;
       });
       x.set(x, 'x');
-      demand(added).be.true();
-      demand(updated).be.undefined();
+      demand(adds).equal(1);
+      demand(updates).equal(0);
     });
     
     it("should accept multiple alert types", function() {
