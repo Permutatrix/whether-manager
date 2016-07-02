@@ -1,22 +1,21 @@
 import * as utils from './utils.js';
 
 export function all(nodes) {
-  if(Array.isArray(nodes)) {
-    return nodes[0].getNodes(false).filter(item => {
-      for(let i = 1, len = nodes.length; i < len; ++i) {
-        if(!nodes[i].has(item)) {
-          return false;
-        }
-      }
-      return true;
-    });
-  } else {
-    const len = arguments.length, nodes_ = Array(len);
+  if(!Array.isArray(nodes)) {
+    const len = arguments.length;
+    nodes = Array(len);
     for(let i = 0; i < len; ++i) {
-      nodes_[i] = arguments[i];
+      nodes[i] = arguments[i];
     }
-    return all(nodes_);
   }
+  return nodes[0].getNodes(false).filter(item => {
+    for(let i = 1, len = nodes.length; i < len; ++i) {
+      if(!nodes[i].has(item)) {
+        return false;
+      }
+    }
+    return true;
+  });
 }
 
 function getNodes(item, index) {
