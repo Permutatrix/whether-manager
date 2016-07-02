@@ -442,7 +442,34 @@ describe("Supernode", function() {
       demand(calls).equal(4);
     });
     
-    // listeners should only be called when a change actually occurs
+    it("shouldn't notify 'add' or 'update' unless a change has occurred", function() {
+      var x = wm.supernode('x'), a = wm.node('a'), calls = 0;
+      x.on('add', 'update', function() {
+        ++calls;
+      });
+      x.set(a);
+      a.set(x);
+      a.set(x, 'x');
+      a.set(x, 'x');
+      x.set(a, 'x');
+      demand(calls).equal(2);
+    });
+    
+    it("shouldn't notify 'remove' unless a change has occurred", function() {
+      var x = wm.supernode('x'), a = wm.node('a'), calls = 0;
+      x.on('remove', function() {
+        ++calls;
+      });
+      x.remove(a);
+      a.remove(x);
+      a.set(x);
+      a.remove(x);
+      x.remove(a);
+      a.remove(x);
+      x.set(a);
+      x.remove(a);
+      demand(calls).equal(2);
+    });
     
   });
   
