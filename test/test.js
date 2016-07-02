@@ -69,6 +69,51 @@ function describeNode(node) {
     
   });
   
+  describe(".values", function() {
+    
+    it("should be an array of link values", function() {
+      var a = node(), b = node(), c = node();
+      demand(a.values).be.empty();
+      a.set(b);
+      demand(a.values).eql([undefined]);
+      a.set(c, 'x');
+      demand(a.values).have.length(2);
+      demand(a.values).include(undefined);
+      demand(a.values).include('x');
+      a.set(b, 'y');
+      demand(a.values).have.length(2);
+      demand(a.values).include('y');
+      demand(a.values).include('x');
+      a.remove(b);
+      demand(a.values).eql(['x']);
+      a.remove(c);
+      demand(a.values).be.empty();
+    });
+    
+    it("should have an order matching that of the nodes array", function() {
+      var a = node(), b = node(), c = node();
+      a.set(b);
+      a.set(c, 'x');
+      demand(a.values).have.length(2);
+      demand(a.values[a.nodes.indexOf(b)]).equal(undefined);
+      demand(a.values[a.nodes.indexOf(c)]).equal('x');
+      a.set(b, 'y');
+      demand(a.values).have.length(2);
+      demand(a.values[a.nodes.indexOf(b)]).equal('y');
+      demand(a.values[a.nodes.indexOf(c)]).equal('x');
+      a.set(a, 'z');
+      demand(a.values).have.length(3);
+      demand(a.values[a.nodes.indexOf(b)]).equal('y');
+      demand(a.values[a.nodes.indexOf(c)]).equal('x');
+      demand(a.values[a.nodes.indexOf(a)]).equal('z');
+      a.remove(c);
+      demand(a.values).have.length(2);
+      demand(a.values[a.nodes.indexOf(b)]).equal('y');
+      demand(a.values[a.nodes.indexOf(a)]).equal('z');
+    });
+    
+  });
+  
   describe(".set()", function() {
     
     it("should return true if there's a change", function() {
