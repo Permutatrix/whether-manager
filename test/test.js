@@ -303,6 +303,55 @@ describe("Supernode", function() {
       demand(calls).equal(2);
     });
     
+    it("should pass the new node and value to the 'add' listener", function() {
+      var x = wm.supernode('x'), a = wm.node('a'), calls = 0, node, value;
+      x.on('add', function(n, v) {
+        ++calls;
+        demand(n).equal(node);
+        demand(v).equal(value);
+      });
+      node = x; value = 'x'; x.set(x, 'x');
+      node = a; value = undefined; x.set(a);
+      x.remove(x); x.remove(a);
+      node = a; value = 12; x.set(a, 12);
+      node = x; value = undefined; x.set(x);
+      demand(calls).equal(4);
+    });
+    
+    it("should pass the new node and value to the 'update' listener", function() {
+      var x = wm.supernode('x'), a = wm.node('a'), calls = 0, node, value;
+      x.on('update', function(n, v) {
+        ++calls;
+        demand(n).equal(node);
+        demand(v).equal(value);
+      });
+      x.set(a, 'x'); x.set(x);
+      node = x; value = 'x'; x.set(x, 'x');
+      node = a; value = undefined; x.set(a);
+      node = a; value = 12; x.set(a, 12);
+      node = x; value = undefined; x.set(x);
+      demand(calls).equal(4);
+    });
+    
+    it("should pass the old node and value to the 'remove' listener", function() {
+      var x = wm.supernode('x'), a = wm.node('a'), calls = 0, node, value;
+      x.on('remove', function(n, v) {
+        ++calls;
+        demand(n).equal(node);
+        demand(v).equal(value);
+      });
+      x.set(x, 'x');
+      x.set(a);
+      x.set(x);
+      x.set(a, 12);
+      node = a; value = 12; x.remove(a);
+      node = x; value = undefined; x.remove(x);
+      demand(calls).equal(2);
+    });
+    
+    // listeners shouldn't be called until after the change is applied
+    // listeners should only be called when a change actually occurs
+    
   });
   
 });
