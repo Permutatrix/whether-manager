@@ -349,7 +349,47 @@ describe("Supernode", function() {
       demand(calls).equal(2);
     });
     
-    // listeners shouldn't be called until after the change is applied
+    it("shouldn't notify 'add' until the node has been added", function() {
+      var x = wm.supernode('x'), a = wm.node('a'), calls = 0;
+      x.on('add', function() {
+        ++calls;
+        demand(x.nodes).eql([a]);
+        demand(a.nodes).eql([x]);
+      });
+      x.set(a);
+      x.remove(a);
+      a.set(x);
+      demand(calls).equal(2);
+    });
+    
+    it("shouldn't notify 'update' until the node has been updated", function() {
+      var x = wm.supernode('x'), a = wm.node('a'), calls = 0, value;
+      x.on('update', function() {
+        ++calls;
+        demand(x.values).eql([value]);
+        demand(a.values).eql([value]);
+      });
+      x.set(a);
+      value = 'x'; x.set(a, 'x');
+      value = undefined; a.set(x);
+      demand(calls).equal(2);
+    });
+    
+    it("shouldn't notify 'remove' until the node has been removed", function() {
+      var x = wm.supernode('x'), a = wm.node('a'), calls = 0;
+      x.on('remove', function() {
+        ++calls;
+        demand(x.values).be.empty();
+        demand(a.values).be.empty();
+      });
+      x.set(a); x.remove(a);
+      a.set(x); a.remove(x);
+      x.set(a); a.remove(x);
+      a.set(x); x.remove(a);
+      demand(calls).equal(4);
+    });
+    
+    // listeners should be called symmetrically
     // listeners should only be called when a change actually occurs
     
   });
