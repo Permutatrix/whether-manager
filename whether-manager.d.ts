@@ -25,10 +25,13 @@ declare module 'whether-manager' {
   }
   
   export interface Supernode<A> extends Node<A>, Family {
+    // overloads are ordered by usefulness for the benefit of autocompleters.
     on(type: string, callback: (node: Node<{}>, value: A) => any): void;
     on(callback: (node: Node<{}>, value: A) => any): void;
+    on(type1: string, type2: string, callback: (node: Node<{}>, value: A) => any): void;
     off(type: string, callback: (node: Node<{}>, value: A) => any): void;
     off(callback: (node: Node<{}>, value: A) => any): void;
+    off(type1: string, type2: string, callback: (node: Node<{}>, value: A) => any): void;
   }
   
   export function node<A>(name?: string): Node<A>;
