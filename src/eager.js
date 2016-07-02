@@ -25,14 +25,7 @@ export function all(...families) {
   const pAdders = [], pRemovers = [];
   const adding = [], removing = [];
   
-  const lazyHases = Array(families.length);
-  for(let i = 0, len = families.length; i < len; ++i) {
-    const item = secret.get(families[i]);
-    if(!item) {
-      throw Error("Attempted to include a non-family in an all()!");
-    }
-    lazyHases[i] = item.lazyHas;
-  }
+  const lazyHases = Array(families.length); // initialize later
   const lazyHas = node => {
     for(let i = 0, len = lazyHases.length; i < len; ++i) {
       if(!lazyHases[i](node)) {
@@ -68,6 +61,10 @@ export function all(...families) {
   
   for(let i = 0, len = families.length; i < len; ++i) {
     const item = secret.get(families[i]);
+    if(!item) {
+      throw Error("Attempted to include a non-family in an all()!");
+    }
+    lazyHases[i] = item.lazyHas;
     item.adders.push(pAdder);
     item.removers.push(pRemover);
     families[i].on('add', adder);
@@ -91,14 +88,7 @@ export function any(...families) {
   const pAdders = [], pRemovers = [];
   const adding = [], removing = [];
   
-  const lazyHases = Array(families.length);
-  for(let i = 0, len = families.length; i < len; ++i) {
-    const item = secret.get(families[i]);
-    if(!item) {
-      throw Error("Attempted to include a non-family in an any()!");
-    }
-    lazyHases[i] = item.lazyHas;
-  }
+  const lazyHases = Array(families.length); // initialize later
   const lazyHas = node => {
     for(let i = 0, len = lazyHases.length; i < len; ++i) {
       if(lazyHases[i](node)) {
@@ -135,6 +125,10 @@ export function any(...families) {
   
   for(let i = 0, len = families.length; i < len; ++i) {
     const item = secret.get(families[i]);
+    if(!item) {
+      throw Error("Attempted to include a non-family in an any()!");
+    }
+    lazyHases[i] = item.lazyHas;
     item.adders.push(pAdder);
     item.removers.push(pRemover);
     families[i].on('add', adder);
