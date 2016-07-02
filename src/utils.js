@@ -91,18 +91,10 @@ export function andNot(yes, no) {
 export function onFunc(alerts) {
   return function() {
     const len = arguments.length - 1, alert = arguments[len];
-    if(len !== 0) {
-      for(let i = 0; i < len; ++i) {
-        if(alerts[arguments[i]]) {
-          alerts[arguments[i]].push(alert);
-        } // fail silently otherwise
-      }
-    } else { // no types passed
-      // add this alert to all types
-      const types = Object.keys(alerts);
-      for(let i = 0, len = types.length; i < len; ++i) {
-        alerts[types[i]].push(alert);
-      }
+    for(let i = 0; i < len; ++i) {
+      if(alerts[arguments[i]]) {
+        alerts[arguments[i]].push(alert);
+      } // fail silently otherwise
     }
   };
 }
@@ -110,18 +102,10 @@ export function onFunc(alerts) {
 export function offFunc(alerts) {
   return function() {
     const len = arguments.length - 1, alert = arguments[len];
-    if(len !== 0) {
-      for(let i = 0; i < len; ++i) {
-        if(alerts[arguments[i]]) {
-          remove(alerts[arguments[i]], alert);
-        } // fail silently otherwise
-      }
-    } else { // no types passed
-      // remove this alert from all types
-      const types = Object.keys(alerts);
-      for(let i = 0, len = types.length; i < len; ++i) {
-        remove(alerts[types[i]], alert);
-      }
+    for(let i = 0; i < len; ++i) {
+      if(alerts[arguments[i]]) {
+        remove(alerts[arguments[i]], alert);
+      } // fail silently otherwise
     }
   };
 }
