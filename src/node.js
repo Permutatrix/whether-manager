@@ -1,8 +1,6 @@
 import * as utils from './utils.js';
 import secret from './secret.js';
 
-const lock = {};
-
 function basicNode(name) {
   let self;
   // this is faster than a Map as long as you keep your link count down.
