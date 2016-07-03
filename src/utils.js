@@ -1,7 +1,3 @@
-export function pushB(a, b) {
-  this.push(b);
-}
-
 export function executeAll(array, arg) {
   for(let i = 0, len = array.length; i < len; ++i) {
     array[i](arg);
@@ -43,17 +39,6 @@ export function remove(array, item) {
     removeIndex(array, index);
   }
   return index;
-}
-
-export function merge() {
-  const out = {};
-  for(let i = 0, len = arguments.length; i < len; ++i) {
-    const obj = arguments[i], keys = Object.keys(obj);
-    for(let i = 0, len = keys.length; i < len; ++i) {
-      out[keys[i]] = obj[keys[i]];
-    }
-  }
-  return out;
 }
 
 export function all(arrays) {
