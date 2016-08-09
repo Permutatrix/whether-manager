@@ -511,3 +511,78 @@ describe("Supernode", function() {
   });
   
 });
+
+describe("has", function() {
+  
+  describe(".all()", function() {
+    
+    it("should return an array of all nodes linked to all arguments", function() {
+      var u = wm.supernode('u'), v = wm.supernode('v'), w = wm.supernode('w'),
+          x = wm.supernode('x'), y = wm.supernode('y'), z = wm.supernode('z');
+      u.set(w); u.set(x); u.set(y);
+      v.set(x); v.set(y); v.set(z);
+      demand(wm.has.all(u, v)).be.a.permutationOf([x, y]);
+    });
+    
+    it("should work on plain nodes", function() {
+      var a = wm.node('a'), b = wm.node('b'), c = wm.node('c'),
+          d = wm.node('d'), e = wm.node('e'), f = wm.node('f');
+      a.set(c); a.set(d); a.set(e);
+      b.set(d); b.set(e); b.set(f);
+      demand(wm.has.all(a, b)).be.a.permutationOf([d, e]);
+    });
+    
+    it("should work on mixed-type nodes", function() {
+      var a = wm.node('a'),      b = wm.node('b'),      c = wm.node('c'),
+          x = wm.supernode('x'), y = wm.supernode('y'), z = wm.supernode('z');
+      a.set(b); a.set(c); a.set(y);
+      x.set(c); x.set(y); x.set(z);
+      demand(wm.has.all(a, x)).be.a.permutationOf([c, y]);
+    });
+    
+    it("should handle an array as an argument", function() {
+      var a = wm.node('a'), b = wm.node('b'), c = wm.node('c'),
+          d = wm.node('d'), e = wm.node('e'), f = wm.node('f');
+      a.set(c); a.set(d); a.set(e);
+      b.set(d); b.set(e); b.set(f);
+      demand(wm.has.all([a, b])).be.a.permutationOf([d, e]);
+    });
+    
+    it("should handle a single argument", function() {
+      var a = wm.node('a'), b = wm.node('b'), c = wm.node('c');
+      a.set(b); a.set(c);
+      demand(wm.has.all(a)).be.a.permutationOf([b, c]);
+    });
+    
+    it("shouldn't return its argument's nodes array", function() {
+      var a = wm.node('a'), b = wm.node('b'), c = wm.node('c');
+      a.set(b); a.set(c);
+      demand(wm.has.all(a)).not.equal(a.nodes);
+    });
+    
+    it("should handle more than 2 arguments", function() {
+      var a = wm.node('a'), b = wm.node('b'), c = wm.node('c'),
+          d = wm.node('d'), e = wm.node('e'), f = wm.node('f');
+      a.set(d); a.set(e);
+      b.set(d); b.set(e);
+      c.set(f); c.set(e);
+      demand(wm.has.all(a, b, c)).be.a.permutationOf([e]);
+    });
+    
+    it("should output its inputs when appropriate", function() {
+      var a = wm.node('a'), b = wm.node('b'), c = wm.node('c');
+      a.set(a); a.set(b); a.set(c);
+      b.set(a); b.set(c);
+      demand(wm.has.all(a, b)).be.a.permutationOf([a, c]);
+    });
+    
+    it("should return an empty array when appropriate", function() {
+      var a = wm.node('a'), b = wm.node('b'), c = wm.node('c');
+      a.set(b); a.set(c);
+      b.set(a);
+      demand(wm.has.all(a, b)).be.empty();
+    });
+    
+  });
+  
+});
