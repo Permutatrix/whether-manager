@@ -41,17 +41,6 @@ export function remove(array, item) {
   return index;
 }
 
-export function all(arrays) {
-  return arrays[0].filter(item => {
-    for(let i = 1, len = arrays.length; i < len; ++i) {
-      if(excludes(arrays[i], item)) {
-        return false;
-      }
-    }
-    return true;
-  });
-}
-
 export function any(arrays) {
   if(arrays.length === 0) {
     return [];
@@ -67,10 +56,6 @@ export function any(arrays) {
     }
   }
   return out;
-}
-
-export function andNot(yes, no) {
-  return yes.filter(item => excludes(no, item));
 }
 
 export function onFunc(alerts) {
