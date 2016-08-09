@@ -340,6 +340,23 @@ describe("Supernode", function() {
       demand(calls).equal(2);
     });
     
+    it("should accept nonexistent alert types", function() {
+      var x = wm.supernode('x');
+      x.on('gain self-awareness', function() {  });
+    });
+    
+    it("should handle nonexistent alert types transparently", function() {
+      var x = wm.supernode('x'), a = wm.node('a'), calls = 0;
+      x.on('add', 'destroy', 'remove', function() {
+        ++calls;
+      });
+      demand(calls).equal(0);
+      x.set(a);
+      demand(calls).equal(1);
+      x.remove(a);
+      demand(calls).equal(2);
+    });
+    
     it("should pass the new node and value to the 'add' listener", function() {
       var x = wm.supernode('x'), a = wm.node('a'), calls = 0, node, value;
       x.on('add', function(n, v) {
@@ -617,6 +634,10 @@ describe("has", function() {
       a.set(c); a.set(d);
       b.set(e); b.set(f);
       demand(wm.has.any([a, b])).be.a.permutationOf([c, d, e, f]);
+    });
+    
+    it("should handle no arguments", function() {
+      demand(wm.has.any()).be.empty();
     });
     
     it("should handle a single argument", function() {
