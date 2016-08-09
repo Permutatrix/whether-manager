@@ -585,4 +585,83 @@ describe("has", function() {
     
   });
   
+  describe(".any()", function() {
+    
+    it("should return an array of all nodes linked to any argument", function() {
+      var u = wm.supernode('u'), v = wm.supernode('v'), w = wm.supernode('w'),
+          x = wm.supernode('x'), y = wm.supernode('y'), z = wm.supernode('z');
+      u.set(w); u.set(x);
+      v.set(y); v.set(z);
+      demand(wm.has.any(u, v)).be.a.permutationOf([w, x, y, z]);
+    });
+    
+    it("should work on plain nodes", function() {
+      var a = wm.node('a'), b = wm.node('b'), c = wm.node('c'),
+          d = wm.node('d'), e = wm.node('e'), f = wm.node('f');
+      a.set(c); a.set(d);
+      b.set(e); b.set(f);
+      demand(wm.has.any(a, b)).be.a.permutationOf([c, d, e, f]);
+    });
+    
+    it("should work on mixed-type nodes", function() {
+      var a = wm.node('a'),      b = wm.node('b'),      c = wm.node('c'),
+          x = wm.supernode('x'), y = wm.supernode('y'), z = wm.supernode('z');
+      a.set(b); a.set(c);
+      x.set(y); x.set(z);
+      demand(wm.has.any(a, x)).be.a.permutationOf([b, c, y, z]);
+    });
+    
+    it("should handle an array as an argument", function() {
+      var a = wm.node('a'), b = wm.node('b'), c = wm.node('c'),
+          d = wm.node('d'), e = wm.node('e'), f = wm.node('f');
+      a.set(c); a.set(d);
+      b.set(e); b.set(f);
+      demand(wm.has.any([a, b])).be.a.permutationOf([c, d, e, f]);
+    });
+    
+    it("should handle a single argument", function() {
+      var a = wm.node('a'), b = wm.node('b'), c = wm.node('c');
+      a.set(b); a.set(c);
+      demand(wm.has.any(a)).be.a.permutationOf([b, c]);
+    });
+    
+    it("shouldn't return its argument's nodes array", function() {
+      var a = wm.node('a'), b = wm.node('b'), c = wm.node('c');
+      a.set(b); a.set(c);
+      demand(wm.has.any(a)).not.equal(a.nodes);
+    });
+    
+    it("should handle more than 2 arguments", function() {
+      var a = wm.node('a'), b = wm.node('b'), c = wm.node('c'),
+          d = wm.node('d'), e = wm.node('e'), f = wm.node('f');
+      a.set(d);
+      b.set(e);
+      c.set(f);
+      demand(wm.has.any(a, b, c)).be.a.permutationOf([d, e, f]);
+    });
+    
+    it("shouldn't duplicate entries", function() {
+      var a = wm.node('a'), b = wm.node('b'), c = wm.node('c'),
+          d = wm.node('d'), e = wm.node('e'), f = wm.node('f');
+      a.set(c); a.set(d); a.set(e);
+      b.set(d); b.set(e); b.set(f);
+      demand(wm.has.any(a, b)).be.a.permutationOf([c, d, e, f]);
+    });
+    
+    it("should output its inputs when appropriate", function() {
+      var a = wm.node('a'), b = wm.node('b'), c = wm.node('c'),
+          d = wm.node('d');
+      a.set(a); a.set(b);
+      b.set(c);
+      c.set(d);
+      demand(wm.has.any(a, b, c)).be.a.permutationOf([a, b, c, d]);
+    });
+    
+    it("should return an empty array when appropriate", function() {
+      var a = wm.node('a'), b = wm.node('b'), c = wm.node('c');
+      demand(wm.has.any(a, b, c)).be.empty();
+    });
+    
+  });
+  
 });
