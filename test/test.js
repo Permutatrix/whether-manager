@@ -664,4 +664,69 @@ describe("has", function() {
     
   });
   
+  describe(".andNot()", function() {
+    
+    it("should return an array of all nodes linked to yes and not no", function() {
+      var yes = wm.supernode('yes'), no = wm.supernode('no'),
+          x = wm.supernode('x'), y = wm.supernode('y'), z = wm.supernode('z');
+      yes.set(x); yes.set(y);
+      no.set(y); no.set(z);
+      demand(wm.has.andNot(yes, no)).be.a.permutationOf([x]);
+    });
+    
+    it("should work on plain nodes", function() {
+      var yes = wm.node('yes'), no = wm.node('no'),
+          a = wm.node('a'), b = wm.node('b'), c = wm.node('c');
+      yes.set(a); yes.set(b);
+      no.set(b); no.set(c);
+      demand(wm.has.andNot(yes, no)).be.a.permutationOf([a]);
+    });
+    
+    it("should work on mixed-type nodes", function() {
+      var yes = wm.supernode('yes'), no = wm.node('no'),
+          x = wm.supernode('x'), y = wm.supernode('y'),
+          a = wm.node('a'), b = wm.node('b');
+      yes.set(x); yes.set(y); yes.set(a);
+      no.set(y); no.set(b);
+      demand(wm.has.andNot(yes, no)).be.a.permutationOf([x, a]);
+    });
+    
+    it("shouldn't return yes's nodes array", function() {
+      var yes = wm.node('yes'), no = wm.node('no'),
+          a = wm.node('a'), b = wm.node('b');
+      yes.set(a); yes.set(b);
+      demand(wm.has.andNot(yes, no)).not.equal(yes.nodes);
+    });
+    
+    it("should output its inputs when appropriate", function() {
+      var yes = wm.node('yes'), no = wm.node('no'),
+          a = wm.node('a'), b = wm.node('b');
+      yes.set(yes); yes.set(a); yes.set(b);
+      no.set(no); no.set(a);
+      demand(wm.has.andNot(yes, no)).be.a.permutationOf([yes, b]);
+    });
+    
+    it("should return an empty array when yes has no nodes", function() {
+      var yes = wm.node('yes'), no = wm.node('no');
+      demand(wm.has.andNot(yes, no)).be.empty();
+    });
+    
+    it("should return an empty array when no has all of yes's nodes", function() {
+      var yes = wm.node('yes'), no = wm.node('no'),
+          a = wm.node('a'), b = wm.node('b');
+      yes.set(a); yes.set(b);
+      no.set(b); no.set(a);
+      demand(wm.has.andNot(yes, no)).be.empty();
+    });
+    
+    it("should handle yes and no with no overlap", function() {
+      var yes = wm.node('yes'), no = wm.node('no'),
+          a = wm.node('a'), b = wm.node('b');
+      yes.set(a);
+      no.set(b);
+      demand(wm.has.andNot(yes, no)).be.a.permutationOf([a]);
+    });
+    
+  });
+  
 });
