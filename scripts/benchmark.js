@@ -33,15 +33,13 @@ if(typeof require === 'function') {
   var require = function require(path) {
     var module = {};
     var exports = module.exports = {};
-    var data;
     if(path === 'must') {
       return noopChain();
     } else if(path === '..') {
-      data = read('../whether-manager.js');
+      (new Function('module', 'exports', 'require', read('../whether-manager.js')))(module, exports, require);
     } else {
-      data = read(path);
+      (new Function('module', 'exports', 'require', read(path)))(module, exports, require);
     }
-    (new Function('module', 'exports', 'require', data))(module, exports, require);
     return module.exports;
   }
   require('../test/test.js');
