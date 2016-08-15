@@ -3,11 +3,24 @@ import secret from './secret.js';
 import * as has from './has.js';
 import * as lazy from './lazy.js';
 
-function construct(nodes, alerts, pimpl) {
+function construct(type, nodes, alerts, pimpl) {
   const out = {
     has: node => !utils.excludes(nodes, node),
-    nodes: nodes,
-    getNodes: copy => copy === undefined || copy ? utils.copy(nodes) : nodes,
+    getNodes: () => utils.copy(nodes),
+    getCount: () => nodes.length,
+    some: cb => {
+      const startingRemovals = pimpl.removals;
+      for(let i = 0; i < nodes.length; ++i) {
+        if(cb(nodes[i])) {
+          return true;
+        }
+        if(pimpl.removals !== startingRemovals) {
+          throw Error(`${pimpl.removals - startingRemovals} nodes removed ` +
+                      `from ${type}() during some() traversal!`);
+        }
+      }
+      return false;
+    },
     on: utils.onFunc(alerts),
     off: utils.offFunc(alerts)
   };
@@ -35,6 +48,8 @@ export function all(...families) {
     return true;
   };
   
+  const pimpl = { adders: pAdders, removers: pRemovers, lazyHas, removals: 0 };
+  
   const pAdder = node => {
     if(lazyHas(node)) {
       nodes.push(node);
@@ -44,6 +59,7 @@ export function all(...families) {
   };
   const pRemover = node => {
     if(utils.remove(nodes, node) !== -1) {
+      ++pimpl.removals;
       removing.push(node);
       utils.executeAll(pRemovers, node);
     }
@@ -72,9 +88,10 @@ export function all(...families) {
   }
   
   return construct(
+    "all",
     nodes,
     { 'add': adders, 'remove': removers },
-    { adders: pAdders, removers: pRemovers, lazyHas }
+    pimpl
   );
 }
 
@@ -98,6 +115,8 @@ export function any(...families) {
     return false;
   };
   
+  const pimpl = { adders: pAdders, removers: pRemovers, lazyHas, removals: 0 };
+  
   const pAdder = node => {
     if(utils.excludes(nodes, node)) {
       nodes.push(node);
@@ -108,6 +127,7 @@ export function any(...families) {
   const pRemover = node => {
     if(!lazyHas(node)) {
       utils.remove(nodes, node);
+      ++pimpl.removals;
       removing.push(node);
       utils.executeAll(pRemovers, node);
     }
@@ -136,9 +156,10 @@ export function any(...families) {
   }
   
   return construct(
+    "any",
     nodes,
     { 'add': adders, 'remove': removers },
-    { adders: pAdders, removers: pRemovers, lazyHas }
+    pimpl
   );
 }
 
@@ -154,6 +175,7 @@ export function andNot(yes, no) {
     throw Error("Attempted to include a non-family in an andNot()!");
   }
   const lazyHas = node => (yesSecret.lazyHas(node) && !noSecret.lazyHas(node));
+  const pimpl = { adders: pAdders, removers: pRemovers, lazyHas, removals: 0 };
   
   const pAdder = node => {
     if(lazyHas(node)) {
@@ -164,6 +186,7 @@ export function andNot(yes, no) {
   };
   const pRemover = node => {
     if(utils.remove(nodes, node) !== -1) {
+      ++pimpl.removals;
       removing.push(node);
       utils.executeAll(pRemovers, node);
     }
@@ -190,8 +213,9 @@ export function andNot(yes, no) {
   no.on('remove', adder);
   
   return construct(
+    "andNot",
     nodes,
     { 'add': adders, 'remove': removers },
-    { adders: pAdders, removers: pRemovers, lazyHas }
+    pimpl
   );
 }

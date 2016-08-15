@@ -202,6 +202,118 @@ function describeNode(node) {
     
   });
   
+  describe(".some()", function() {
+    
+    function collect(cb) {
+      const out = [];
+      cb(function(x) { out.push(x); });
+      return out;
+    }
+    
+    it("should iterate over every linked node", function() {
+      var a = node(), b = node(), c = node();
+      a.set(b);
+      demand(collect(a.some)).be.a.permutationOf([b]);
+      a.set(c);
+      demand(collect(a.some)).be.a.permutationOf([b, c]);
+      a.remove(b);
+      demand(collect(a.some)).be.a.permutationOf([c]);
+      a.set(a);
+      demand(collect(a.some)).be.a.permutationOf([c, a]);
+    });
+    
+    it("should pass in link values as the second argument", function() {
+      var a = node(), b = node();
+      a.set(b, 'b');
+      a.some(function(node, value) {
+        demand(value).equal('b');
+      });
+    });
+    
+    it("should handle a node with no links", function() {
+      var a = node();
+      a.some(function() {
+        throw Error("The callback was called!");
+      });
+    });
+    
+    it("should stop iteration and return true when a truthy value is returned", function() {
+      var a = node(), b = node();
+      a.set(a);
+      a.set(b);
+      var first = true;
+      demand(a.some(function() {
+        if(first) {
+          first = false;
+          return true;
+        } else {
+          throw Error("The callback was called a second time!");
+        }
+      })).be.true();
+      demand(a.some(function() {
+        if(!first) {
+          first = true;
+          return 1;
+        } else {
+          throw Error("The callback was called a second time!");
+        }
+      })).be.true();
+    });
+    
+    it("should continue to the end and return false otherwise", function() {
+      var a = node(), b = node();
+      a.set(a);
+      a.set(b);
+      var calls = 0;
+      demand(a.some(function() {
+        ++calls;
+        return false;
+      })).be.false();
+      demand(calls).equal(2);
+      demand(a.some(function() {
+        ++calls;
+      })).be.false();
+      demand(calls).equal(4);
+    });
+    
+    it("should include nodes added during iteration", function() {
+      var a = node(), b = node();
+      a.set(a);
+      var calledWithB = false;
+      a.some(function(node, value) {
+        if(node === b) {
+          demand(value).equal('b');
+          calledWithB = true;
+        } else {
+          a.set(b, 'b');
+        }
+      });
+      demand(calledWithB).be.true();
+    });
+    
+    it("should throw if nodes are removed during iteration", function() {
+      var a = node(), b = node();
+      a.set(a);
+      a.set(b);
+      demand(function() {
+        a.some(function() {
+          a.remove(b);
+        });
+      }).throw(/nodes removed from node/);
+    });
+    
+    it("should throw if the only node is removed during iteration", function() {
+      var a = node(), b = node();
+      a.set(b);
+      demand(function() {
+        a.some(function() {
+          a.remove(b);
+        });
+      }).throw(/nodes removed from node/);
+    });
+    
+  });
+  
 }
 
 describe("Node", function() {
