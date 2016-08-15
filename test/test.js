@@ -182,6 +182,26 @@ function describeNode(node) {
     
   });
   
+  describe(".getCount()", function() {
+    
+    it("should return the number of linked nodes", function() {
+      var a = node(), b = node(), c = node();
+      demand(a.getCount()).equal(0);
+      a.set(b);
+      demand(a.getCount()).equal(1);
+      a.set(c);
+      demand(a.getCount()).equal(2);
+      a.remove(b);
+      demand(a.getCount()).equal(1);
+      a.set(a);
+      demand(a.getCount()).equal(2);
+      a.remove(c);
+      a.remove(a);
+      demand(a.getCount()).equal(0);
+    });
+    
+  });
+  
 }
 
 describe("Node", function() {
