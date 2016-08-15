@@ -31,28 +31,23 @@ function basicNode(name) {
     return false;
   };
   const has = node => {
-    return node.nodes.length < nodes.length ?
-             !utils.excludes(node.nodes, self) :
+    return node.getCount() < nodes.length ?
+             node.has(self) :
              !utils.excludes(nodes, node);
   };
   const get = (node, unvalue) => {
-    if(node.nodes.length < nodes.length) {
-      const index = utils.indexOf(node.nodes, self);
-      if(index !== -1) {
-        return node.values[index];
-      }
+    if(node.getCount() < nodes.length) {
+      return node.get(self, unvalue);
     } else {
       const index = utils.indexOf(nodes, node);
-      if(index !== -1) {
-        return values[index];
-      }
+      return index === -1 ? unvalue : values[index];
     }
-    return unvalue;
   };
-  const getNodes = copy => copy === undefined || copy ? utils.copy(nodes) : nodes;
+  const getNodes = () => utils.copy(nodes);
+  const getCount = () => nodes.length;
   
   self = {
-    name, set, remove, has, get, getNodes, nodes, values
+    name, set, remove, has, get, getNodes, getCount
   };
   return self;
 }
@@ -61,26 +56,24 @@ export function node(name) {
   return Object.freeze(basicNode(name));
 }
 
+// Why be DRY when you can be... not DRY?
 export function supernode(name) {
-  const self = basicNode(name);
+  let self;
+  const nodes = [], values = [];
   const adders = [], updaters = [], removers = [];
   const pAdders = [], pRemovers = [];
   
-  const nhas = self.has, nnodes = self.nodes, nvalues = self.values;
-  
-  secret.set(self, { adders: pAdders, removers: pRemovers, lazyHas: nhas });
-  
-  self.set = (node, value) => {
-    const index = utils.indexOf(nnodes, node);
-    if(index === -1 || nvalues[index] !== value) {
+  const set = (node, value) => {
+    const index = utils.indexOf(nodes, node);
+    if(index === -1 || values[index] !== value) {
       let alerts = updaters;
       if(index === -1) {
-        nnodes.push(node);
-        nvalues.push(value);
+        nodes.push(node);
+        values.push(value);
         alerts = adders;
         utils.executeAll(pAdders, node);
       } else {
-        nvalues[index] = value;
+        values[index] = value;
       }
       node.set(self, value);
       for(let i = 0, len = alerts.length; i < len; ++i) {
@@ -90,11 +83,11 @@ export function supernode(name) {
     }
     return false;
   };
-  self.remove = node => {
-    const index = utils.remove(nnodes, node);
+  const remove = node => {
+    const index = utils.remove(nodes, node);
     if(index !== -1) {
-      const value = nvalues[index];
-      utils.removeIndex(nvalues, index);
+      const value = values[index];
+      utils.removeIndex(values, index);
       utils.executeAll(pRemovers, node);
       node.remove(self);
       for(let i = 0, len = removers.length; i < len; ++i) {
@@ -104,10 +97,31 @@ export function supernode(name) {
     }
     return false;
   };
+  const has = node => {
+    return node.getCount() < nodes.length ?
+             node.has(self) :
+             !utils.excludes(nodes, node);
+  };
+  const get = (node, unvalue) => {
+    if(node.getCount() < nodes.length) {
+      return node.get(self, unvalue);
+    } else {
+      const index = utils.indexOf(nodes, node);
+      return index === -1 ? unvalue : values[index];
+    }
+  };
+  const getNodes = () => utils.copy(nodes);
+  const getCount = () => nodes.length;
   
   const alerts = { 'add': adders, 'update': updaters, 'remove': removers };
-  self.on = utils.onFunc(alerts);
-  self.off = utils.offFunc(alerts);
+  const on = utils.onFunc(alerts);
+  const off = utils.offFunc(alerts);
+  
+  self = {
+    name, set, remove, has, get, getNodes, getCount, on, off
+  };
+  
+  secret.set(self, { adders: pAdders, removers: pRemovers, lazyHas: has });
   
   return Object.freeze(self);
 }

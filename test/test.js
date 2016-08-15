@@ -50,64 +50,6 @@ function describeNode(node) {
     
   });
   
-  describe(".nodes", function() {
-    
-    it("should be an array of linked nodes", function() {
-      var a = node(), b = node(), c = node();
-      demand(a.nodes).be.empty();
-      a.set(b);
-      demand(a.nodes).be.a.permutationOf([b]);
-      a.set(c);
-      demand(a.nodes).be.a.permutationOf([b, c]);
-      a.remove(b);
-      demand(a.nodes).be.a.permutationOf([c]);
-      a.remove(c);
-      demand(a.nodes).be.empty();
-    });
-    
-  });
-  
-  describe(".values", function() {
-    
-    it("should be an array of link values", function() {
-      var a = node(), b = node(), c = node();
-      demand(a.values).be.empty();
-      a.set(b);
-      demand(a.values).be.a.permutationOf([undefined]);
-      a.set(c, 'x');
-      demand(a.values).be.a.permutationOf([undefined, 'x']);
-      a.set(b, 'y');
-      demand(a.values).be.a.permutationOf(['y', 'x']);
-      a.remove(b);
-      demand(a.values).be.a.permutationOf(['x']);
-      a.remove(c);
-      demand(a.values).be.empty();
-    });
-    
-    it("should have an order matching that of the nodes array", function() {
-      var a = node(), b = node(), c = node();
-      a.set(b);
-      a.set(c, 'x');
-      demand(a.values).have.length(2);
-      demand(a.values[a.nodes.indexOf(b)]).equal(undefined);
-      demand(a.values[a.nodes.indexOf(c)]).equal('x');
-      a.set(b, 'y');
-      demand(a.values).have.length(2);
-      demand(a.values[a.nodes.indexOf(b)]).equal('y');
-      demand(a.values[a.nodes.indexOf(c)]).equal('x');
-      a.set(a, 'z');
-      demand(a.values).have.length(3);
-      demand(a.values[a.nodes.indexOf(b)]).equal('y');
-      demand(a.values[a.nodes.indexOf(c)]).equal('x');
-      demand(a.values[a.nodes.indexOf(a)]).equal('z');
-      a.remove(c);
-      demand(a.values).have.length(2);
-      demand(a.values[a.nodes.indexOf(b)]).equal('y');
-      demand(a.values[a.nodes.indexOf(a)]).equal('z');
-    });
-    
-  });
-  
   describe(".set()", function() {
     
     it("should return true if there's a change", function() {
@@ -231,21 +173,12 @@ function describeNode(node) {
       demand(a.getNodes()).be.empty();
     });
     
-    it("should return a new array on each invocation by default", function() {
+    it("should return a new array on each invocation", function() {
       var a = node(), b = node();
       demand(a.getNodes()).not.equal(a.getNodes());
       a.set(b);
       demand(a.getNodes()).not.equal(a.getNodes());
     });
-    
-    it("should return a new array on each invocation when passed a truthy value", function() {
-      var a = node(), b = node();
-      demand(a.getNodes(false)).not.equal(a.getNodes(1));
-      a.set(b);
-      demand(a.getNodes(false)).not.equal(a.getNodes(true));
-    });
-    
-    // there's no test for the inverse because that behavior is undefined.
     
   });
   
@@ -460,8 +393,8 @@ describe("Supernode", function() {
       var x = wm.supernode('x'), a = wm.node('a'), calls = 0;
       x.on('add', function() {
         ++calls;
-        demand(x.nodes).eql([a]);
-        demand(a.nodes).eql([x]);
+        demand(x.getNodes()).eql([a]);
+        demand(a.getNodes()).eql([x]);
       });
       x.set(a);
       x.remove(a);
@@ -473,8 +406,8 @@ describe("Supernode", function() {
       var x = wm.supernode('x'), a = wm.node('a'), calls = 0, value;
       x.on('update', function() {
         ++calls;
-        demand(x.values).eql([value]);
-        demand(a.values).eql([value]);
+        demand(x.get(a)).equal(value);
+        demand(a.get(x)).equal(value);
       });
       x.set(a);
       value = 'x'; x.set(a, 'x');
@@ -486,8 +419,8 @@ describe("Supernode", function() {
       var x = wm.supernode('x'), a = wm.node('a'), calls = 0;
       x.on('remove', function() {
         ++calls;
-        demand(x.values).be.empty();
-        demand(a.values).be.empty();
+        demand(x.getNodes()).be.empty();
+        demand(a.getNodes()).be.empty();
       });
       x.set(a); x.remove(a);
       a.set(x); a.remove(x);
@@ -574,7 +507,7 @@ describe("has", function() {
     it("shouldn't return its argument's nodes array", function() {
       var a = wm.node('a'), b = wm.node('b'), c = wm.node('c');
       a.set(b); a.set(c);
-      demand(wm.has.all(a)).not.equal(a.nodes);
+      demand(wm.has.all(a)).not.equal(a.getNodes());
     });
     
     it("should handle more than 2 arguments", function() {
@@ -649,7 +582,7 @@ describe("has", function() {
     it("shouldn't return its argument's nodes array", function() {
       var a = wm.node('a'), b = wm.node('b'), c = wm.node('c');
       a.set(b); a.set(c);
-      demand(wm.has.any(a)).not.equal(a.nodes);
+      demand(wm.has.any(a)).not.equal(a.getNodes());
     });
     
     it("should handle more than 2 arguments", function() {
@@ -716,7 +649,7 @@ describe("has", function() {
       var yes = wm.node('yes'), no = wm.node('no'),
           a = wm.node('a'), b = wm.node('b');
       yes.set(a); yes.set(b);
-      demand(wm.has.andNot(yes, no)).not.equal(yes.nodes);
+      demand(wm.has.andNot(yes, no)).not.equal(yes.getNodes());
     });
     
     it("should output its inputs when appropriate", function() {
